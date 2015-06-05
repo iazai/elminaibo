@@ -19,7 +19,115 @@ class Stock extends CI_Controller {
 	public function index() {
 	}
 	
+	function push_button() {
+		if ($_POST['action'] == 'Activate Stock') {
+			$this->activate();
+		} else if ($_POST['action'] == 'Move Stock into Trash') {
+			$this->deactivate();
+		}
+	}
 	
+	function activate() {
+		$searchterm = $this->session->userdata('searchterm');
+		$totalrow = $this->stock_model->record_count($searchterm);
+		$stockcount = 0;
+		for ($i = 0;$i<= $totalrow;$i++) {
+			$ch = $this->input->post('ch'.$i);
+			if ( isset($_POST['ch'.$i]) ) {
+				
+				$this->db->where('stock_id', $ch);
+				$querystock = $this->db->get('tb_stock');
+				foreach ($querystock->result() as $row) {
+					// UPDATE STATUS PENGIRIMAN
+					$stock_status = array (
+						'stock_status' => 1
+						);
+						
+					$this->db->where('stock_id', $ch);
+					$this->db->update('tb_stock', $stock_status);
+					$stockcount++;
+				}
+			}
+		}
+		
+		
+		// add to activity
+		$session_data = $this->session->userdata('logged_in');
+		$activity_desc = 'STOCK - Activate [ <b>'.$stockcount.' Stock(s) </b>]';
+		$this->activity_model->add_activity($session_data['user_id'], $activity_desc);
+		
+		$msg .= '<p>Stock has been activated</p>';
+		$this->session->set_flashdata('success_message',$msg);	
+						
+		redirect(site_url('stock/lists')); 
+	}
+	
+	function deactivate() {
+		$searchterm = $this->session->userdata('searchterm');
+		$totalrow = $this->stock_model->record_count($searchterm);
+		$stockcount = 0;
+		for ($i = 0;$i<= $totalrow;$i++) {
+			$ch = $this->input->post('ch'.$i);
+			if ( isset($_POST['ch'.$i]) ) {
+				
+				$this->db->where('stock_id', $ch);
+				$querystock = $this->db->get('tb_stock');
+				foreach ($querystock->result() as $row) {
+					// UPDATE STATUS PENGIRIMAN
+					$stock_status = array (
+						'stock_status' => 2
+						);
+						
+					$this->db->where('stock_id', $ch);
+					$this->db->update('tb_stock', $stock_status);
+					$stockcount++;
+				}
+			}
+		}
+		
+		
+		// add to activity
+		$session_data = $this->session->userdata('logged_in');
+		$activity_desc = 'STOCK - Deactivate [ <b>'.$stockcount.' Stock(s) </b>]';
+		$this->activity_model->add_activity($session_data['user_id'], $activity_desc);
+		
+		$msg .= '<p>Stock has been trashed</p>';
+		$this->session->set_flashdata('success_message',$msg);	
+						
+		redirect(site_url('stock/lists')); 
+	}
+	
+	
+	public function insert_inventory_qty() {
+		if($this->session->userdata('logged_in')) {
+			// fetching stock
+			$this->db->where('stock_qty >', 0);
+			$this->db->where('stock_status', 1);
+			
+			$query = $this->db->get('tb_stock');
+			
+			if ($query->num_rows > 0) {
+				foreach ($query->result() as $row) {
+					$this->db->where('stock_id', $row->stock_id);
+					$this->db->limit(1);
+					$queryInv = $this->db->get('tb_inventory');
+					
+					foreach ($queryInv->result() as $rowInv) {
+						
+						$inv = array(
+							   'inventory_qty' => $row->stock_qty,
+							   'inventory_qty_init' => $row->stock_qty,
+							   'inventory_cogs' => $row->stock_cogs,
+							);
+						
+						$this->db->where('inventory_id', $rowInv->inventory_id); 
+						$this->db->update('tb_inventory', $inv);
+					}
+				}
+				echo 'done';
+			}
+		}
+	}
 	public function insert_date() {
 		if($this->session->userdata('logged_in')) {
 			// Set timezone
@@ -96,9 +204,7 @@ class Stock extends CI_Controller {
 	}
 	
 	public function view_stock() {
-		
-			
-			// 
+			//
 			$count=$this->db->count_all_results('tb_product');
 			$output="UPDATE STOK - ".date('d M Y', strtotime('now'))."<br/>";
 			
@@ -111,6 +217,7 @@ class Stock extends CI_Controller {
 					
 					// fetching stock
 					$this->db->where('stock_qty >', 0);
+					$this->db->where('stock_status', 1);
 					
 					$this->db->where('tb_stock.product_id', $ch);
 					$this->db->join('tb_product', 'tb_product.product_id = tb_stock.product_id');
@@ -125,7 +232,7 @@ class Stock extends CI_Controller {
 					}	
 					foreach ($query->result() as $row) {
 						$output.= $row->product_name.' - '.$row->stock_desc;
-						if ($row->stock_qty <= 3) {
+						if ($row->stock_qty <= 20) {
 							$output.=' ['.$row->stock_qty.' pcs]';
 						} else {
 							
@@ -166,6 +273,8 @@ class Stock extends CI_Controller {
 			$this->load->helper('form');
 			$this->load->library('form_validation');
 			
+			
+			
 			// SEARCHING TERMS
 			$searchterm = $this->session->userdata('searchterm');
 			
@@ -204,11 +313,13 @@ class Stock extends CI_Controller {
 			$inventory_type_id = $option_stock->row()->option_id;
 			
 			// looking for products for define COGS of this stock
+			/*
 			$product_id = $this->input->post('product_id');
 			$this->db->where('product_id', $product_id);
 			$this->db->limit(1);
 			$option_stock = $this->db->get('tb_product');
-			$stock_cogs = $option_stock->row()->current_cogs;
+			*/
+			$stock_cogs = $this->input->post('stock_cogs');
 			
 			// set up nominal of purchasing
 			$nominal = $this->input->post('stock_qty') * $stock_cogs;
@@ -222,6 +333,7 @@ class Stock extends CI_Controller {
 				   'stock_cogs' => $stock_cogs,
 				   'stock_price' => $this->input->post('stock_price'),
 				   'stock_nominal' => $nominal,
+				   'stock_status' => $this->input->post('stock_status'),
 				   'product_id' => $this->input->post('product_id'),
 				   'store_id_product' => $this->input->post('store_id_product'),
 				   'store_id_category_default' => $this->input->post('store_category')
@@ -231,9 +343,20 @@ class Stock extends CI_Controller {
 			$msg += '<p>Stock ('.$this->input->post('stock_desc').') has been added..!</p><br/>';
 			
 			// insert into inventory
+			// SET DATE
+			date_default_timezone_set('Asia/Bangkok');
+			$inventory_date = date('Y-m-d', strtotime($this->input->post('stock_date')));
+			
+			if ($inventory_date == date('Y-m-d')) {
+				$inventory_date = date('Y-m-d H:i:s');
+			}
+			
 			$inventory = array(
-				   'inventory_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
+				   'inventory_date' => $inventory_date,
 				   'inventory_desc' => $this->input->post('stock_desc'),
+				   'inventory_qty' => $this->input->post('stock_qty'),
+				   'inventory_qty_init' => $this->input->post('stock_qty'),
+				   'inventory_cogs' => $stock_cogs,
 				   'inventory_nominal' => $nominal,
 				   'inventory_type_id' => $inventory_type_id,
 				   'stock_id' => $stock_id
@@ -266,12 +389,13 @@ class Stock extends CI_Controller {
 			$option_stock = $this->db->get('tb_options');
 			$inventory_type_id = $option_stock->row()->option_id;
 			
-			// looking for products for define COGS of this stock
+			/* looking for products for define COGS of this stock
 			$product_id = $this->input->post('product_id');
 			$this->db->where('product_id', $product_id);
 			$this->db->limit(1);
 			$option_stock = $this->db->get('tb_product');
-			$stock_cogs = $option_stock->row()->current_cogs;
+			*/
+			$stock_cogs = $this->input->post('stock_cogs');
 			
 			// set up nominal of purchasing
 			$nominal = $this->input->post('stock_qty') * $stock_cogs;
@@ -287,15 +411,16 @@ class Stock extends CI_Controller {
 			$msg = "";
 			// updating stock
 			$stock = array(
-				   'stock_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
+				   //'stock_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
 				   'stock_desc' => $this->input->post('stock_desc'),
 				   //'stock_qty' => $this->input->post('stock_qty'),
-				   'stock_cogs' => $stock_cogs,
+				   //'stock_cogs' => $stock_cogs,
 				   'stock_price' => $this->input->post('stock_price'),
-				   'stock_nominal' => $nominal,
+				   'stock_status' => $this->input->post('stock_status'),
+				   //'stock_nominal' => $nominal,
 				   'product_id' => $this->input->post('product_id'),
-				   'store_id_product' => $this->input->post('store_id_product'),
-				   'store_id_category_default' => $this->input->post('store_category')
+				   //'store_id_product' => $this->input->post('store_id_product'),
+				   //'store_id_category_default' => $this->input->post('store_category')
 				);
 				
 			$this->db->where('stock_id', $this->input->post('stock_id')); 
@@ -306,12 +431,10 @@ class Stock extends CI_Controller {
 			
 			// updating inventory
 			$inventory = array(
-				   'inventory_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
-				   'inventory_desc' => $this->input->post('stock_desc'),
-				   'inventory_nominal' => $nominal,
+				   'inventory_desc' => 'Barang masuk : '.$this->input->post('stock_desc'),
 				);
 			
-			$this->db->where('inventory_id',$inventory_row->inventory_id);
+			$this->db->where('stock_id',$stock_id);
 			$this->db->update('tb_inventory', $inventory);
 			
 			$msg += '<p>Inventory for ('.$this->input->post('stock_desc').') has been updated..!</p><br/>';
@@ -339,7 +462,8 @@ class Stock extends CI_Controller {
 			$this->db->where('product_id', $product_id);
 			$this->db->limit(1);
 			$product = $this->db->get('tb_product');
-			$stock_cogs = $product->row()->current_cogs;
+			
+			$stock_cogs = $this->input->post('stock_cogs');//$product->row()->current_cogs;
 			
 			// looking for inventory purchase type id
 			$this->db->where('option_code', 'INV_PUR');
@@ -368,6 +492,7 @@ class Stock extends CI_Controller {
 				$stock = array(
 				   'stock_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
 				   'stock_qty' => $stock_row->stock_qty + $this->input->post('stock_qty'),
+				   'stock_cogs' => $this->input->post('stock_cogs'),
 				   'product_id' => $this->input->post('product_id')
 				);
 			
@@ -377,17 +502,28 @@ class Stock extends CI_Controller {
 				}
 				
 				// === UPDATE STOCK ON STORE VIA WEBSERVICE ===
-				$this->stock_model->update_category_on_store($stock_id);
+				// $this->stock_model->update_category_on_store($stock_id);
 				// ==== === === === === === === === === === ===
 			
 				$msg .= '<p>Stock '.$this->input->post('stock_desc').' has been updated</p>';
 			}
 			
 			// insert into inventory
+			// SET DATE
+			date_default_timezone_set('Asia/Bangkok');
+			$inventory_date = date('Y-m-d', strtotime($this->input->post('stock_date')));
+			
+			if ($inventory_date == date('Y-m-d')) {
+				$inventory_date = date('Y-m-d H:i:s');
+			}
+			
 			if ($nominal > 0) {
 				$inventory = array(
-					'inventory_date' => date('Y-m-d', strtotime($this->input->post('stock_date'))),
+					'inventory_date' => $inventory_date,
 					'inventory_desc' => $this->input->post('stock_desc'),
+					'inventory_qty' => $this->input->post('stock_qty'),
+					'inventory_qty_init' => $this->input->post('stock_qty'),
+					'inventory_cogs' => $stock_cogs,
 					'inventory_nominal' => $nominal,
 					'inventory_type_id' => $inventory_type_id,
 					'stock_id' => $stock_id
@@ -441,20 +577,18 @@ class Stock extends CI_Controller {
 			$stock_cogs = $product->row()->current_cogs;
 			$product_name = $product->row()->product_name;
 			
-			// calculate stock_qty
-			$inventory_nominal = $inventory_row->inventory_nominal;
-			$stock_qty = $inventory_nominal / $stock_cogs;
-			
 			// updating stock
 			$stock = array(
-				   'stock_qty' => $last_stock_qty - $stock_qty
+				   'stock_qty' => $last_stock_qty - $inventory_row->inventory_qty
 				);
 			$this->db->where('stock_id', $stock_id); 
 			$this->db->update('tb_stock', $stock);
 			
+			/*
 			// === UPDATE STOCK ON STORE VIA WEBSERVICE ===
 			$this->stock_model->update_category_on_store($stock_id);
 			// ==== === === === === === === === === === ===
+			*/
 			
 			$this->db->delete('tb_inventory', array('inventory_id' => $inventory_id));
 			
@@ -510,9 +644,9 @@ class Stock extends CI_Controller {
 			$this->db->order_by('product_name');
 			$data['product_name'] = $this->db->get('tb_product')->result();
 			
-			$this->db->where('option_type', 'STORE_CATEGORY');
+			$this->db->where('option_type', 'STOCK_STATUS');
 			$this->db->order_by('option_desc');
-			$data['store_category'] = $this->db->get('tb_options')->result();
+			$data['stock_status'] = $this->db->get('tb_options')->result();
 			
 			/**
 			
@@ -534,18 +668,18 @@ class Stock extends CI_Controller {
 			$this->db->order_by('product_name');
 			$data['product_name'] = $this->db->get('tb_product')->result();
 			
-			$this->db->where('option_type', 'STORE_CATEGORY');
+			$this->db->where('option_type', 'STOCK_STATUS');
 			$this->db->order_by('option_desc');
-			$data['store_category'] = $this->db->get('tb_options')->result();
-			
+			$data['stock_status'] = $this->db->get('tb_options')->result();
 			
 			// QUERY stock
 			$this->db->select('*, tb_stock.stock_id AS main_stock_id, tb_inventory.inventory_id AS main_inventory_id');
 			$this->db->from('tb_stock');
-			$this->db->join('tb_inventory', 'tb_inventory.stock_id = tb_stock.stock_id','left');
-			$this->db->join('tb_cash', 'tb_cash.inventory_id = tb_inventory.inventory_id','left');
-			$this->db->join('tb_liabilities', 'tb_liabilities.inventory_id = tb_inventory.inventory_id','left');
+			$this->db->join('tb_inventory', 'tb_inventory.stock_id = tb_stock.stock_id');
+			//$this->db->join('tb_cash', 'tb_cash.inventory_id = tb_inventory.inventory_id');
+			//$this->db->join('tb_liabilities', 'tb_liabilities.inventory_id = tb_inventory.inventory_id');
 			$this->db->where('tb_stock.stock_id',$this->uri->segment(3));
+			$this->db->limit(1);
 			$data['stock'] = $this->db->get()->result();
 			
 			$this->db->where('stock_id',$this->uri->segment(3));
@@ -596,7 +730,8 @@ class Stock extends CI_Controller {
 			$searchparam = array(
 				   'stock_desc' => $this->input->post('stock_desc'),
 				   'product_id' => $this->input->post('product_id'),
-				   'qty_minimum' => $this->input->post('qty_minimum')
+				   'qty_minimum' => $this->input->post('qty_minimum'),
+				   'stock_status' => $this->input->post('stock_status')
 			);
 			
 			$this->GenericModel->searchterm_handler($searchparam);
@@ -649,7 +784,7 @@ class Stock extends CI_Controller {
 	
 	public function restock_history() {
 		if($this->session->userdata('logged_in')) {	
-			$this->db->select('inventory_id, inventory_date, tb_inventory.inventory_nominal / tb_product.current_cogs as stock_qty');
+			$this->db->select('*');
 			$this->db->from('tb_inventory');
 			$this->db->join('tb_stock', 'tb_stock.stock_id = tb_inventory.stock_id','left');
 			$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id','left');

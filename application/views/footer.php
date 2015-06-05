@@ -16,3 +16,9 @@
     </div><!--rightpanel-->
     
 </div><!--mainwrapper-->
+
+<script>
+	$(document).ready(function() {
+		$('.nominal').formatCurrency();
+	});
+</script>

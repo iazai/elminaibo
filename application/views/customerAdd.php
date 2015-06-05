@@ -79,19 +79,22 @@
 									</span>
 								</p>
 								<p>
-									<label>Pelanggan Dropshipper ?<font style="color:red;">*</font></label>
+									<label>Dropship ?<font style="color:red;">*</font></label>
 									<span class="field">
 										<input id="is_ds" name="is_ds" type="checkbox" onclick="validateDS()" />
 									</span>
 								</p>
 								<div id="dropshipForm" style="display:none;">
 									<p>
-										<label><font style="color:blue;">Nama Dropshipper</font></label>
-										<span class="field"><input type="text" name="shipper_name" id="shipper_name" class="input-medium validate[required],custom[phone]" /></span>
-									</p>
-									<p>
-										<label><font style="color:blue;">Telp Dropshipper</font></label>
-										<span class="field"><input type="text" name="shipper_phone" id="shipper_phone" class="input-medium validate[required],custom[phone]" /></span>
+										<label><font style="color:blue;">Nama Agen</font></label>
+										<span class="field">
+											<select name="agent_id" id="agent_id" class="input-xlarge">
+												<option value=''>- Choose Agent -</option>
+											<?php foreach($agents as $agent): ?>
+												<option value="<?php echo $agent->billing_id?>"><?php echo $agent->billing_name?></option>
+											<?php endforeach; ?>
+											</select>
+										</span>
 									</p>
 								</div>
 								<p class="stdformbutton">

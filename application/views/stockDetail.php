@@ -35,28 +35,37 @@
                     </colgroup>
                     <thead>
                         <tr>
-                          	<th width="2%" class="head1 center">No</th>
-							<th width="8%" class="head1 center">Date</th>
-							<th width="2%" class="head1 center">Re stock</th>
-							<th width="2%" class="head0 center">Reject</th>
-							<th width="2%" class="head1 center">Adj.</th>
-							<th width="2%" class="head1 center">Keep</th>
-							<th width="2%" class="head1 center">Sold</th>
-							<th width="2%" class="head1 center">Final Stock</th>
+                          	<th width="10%" class="head1 center">No</th>
+							<th width="30%" class="head1 center">Date</th>
+							<th width="10%" class="head1 center">Re stock</th>
+							<th width="10%" class="head0 center">Reject</th>
+							<th width="10%" class="head1 center">Adj.</th>
+							<th width="10%" class="head1 center">Keep</th>
+							<th width="10%" class="head1 center">Sold</th>
+							<th width="10%" class="head1 center">Final Stock</th>
                         </tr>
                     </thead>
                     <tbody>
 					
 						<tr class="gradeX">
-							<form id="adjust_stock" name="adjust_stock" class="stdform" method="post" action="<?=base_url()?>index.php/stock/doAdjust/" />
-							<input type="hidden" value="<?=$item->stock_id?>" name="stock_id"/>
-							<td class="center">*</td>
-		                    <td class="center"><input type="text" class="input-small validate[required]" name="general_date" id ="general_date"/></td>
-							<td class="center"><input type="text" style="width:30px;" disabled name="restock_qty" id ="restock_qty"/></td>
-							<td class="center"><input type="text" style="width:30px;" disabled name="reject_qty" id ="reject_qty"/></td>
-							<td class="center"><input type="text" class="validate[required]" style="width:30px;" name="adj_qty" id ="adj_qty"/></td>
-							<td class="center" colspan=3><button class="btn btn-primary" style="width:auto;">SUBMIT</button></td>
-							</form>
+							<td class="left" colspan="8">
+								<form id="addStock" name="adjust_stock" class="stdform" method="post" action="<?=base_url()?>index.php/stock/doAdjust/" />
+									<input type="hidden" value="<?=$item->stock_id?>" name="stock_id"/>
+									<ul class="search-field">
+										<li>
+											<label>Date</label>
+											<input type="text" class="input-small validate[required]" name="general_date" id ="general_date"/>
+										</li>
+										<li>
+											<label>Adjustment Qty</label>
+											<input type="text" placeholder="Qty" class="validate[required]" style="width:30px;" name="adj_qty" id ="adj_qty"/>
+										</li>
+										<li>
+											<input type="submit" class="btn btn-primary"/>
+										</li>
+									</ul>
+								</form>
+							</td>
                         </tr>
 <?php } ?>
                     	<?php  if ($list_stock_detail == null) {
@@ -85,7 +94,7 @@
 				
 <script>
 	$(document).ready(function(){
-		$("#adjust_stock").validationEngine();
+		$("#addStock").validationEngine();
     });
 	
 	$(function() {

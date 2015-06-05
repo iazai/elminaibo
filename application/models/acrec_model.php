@@ -27,6 +27,7 @@ class Acrec_model extends CI_Model {
         
 		$this->db->select('*');
 		$this->db->from('tb_acrec');
+		$this->db->where('acrec_nominal >', 0);
 		
 		if (!empty($searchparam['acrec_type_id'])) {
 			$this->db->where('acrec_type_id', $searchparam['acrec_type_id']);

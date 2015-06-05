@@ -37,19 +37,19 @@
 										</select>
 									</span>
 								</p>
-								<p>
+								<!--p>
 									<label>Date  <font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" name="stock_date" id ="stock_date" class="validate[required]" value="<?php if ($item->stock_date != '0000-00-00') echo date("d-M-Y", strtotime($item->stock_date)); else echo '';?>"/>
 									</span>
-								</p>
+								</p-->
 								<p>
 									<label>Description <font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="stock_desc" id="stock_desc" value="<?=$item->stock_desc?>"/> 
 									</span>
 								</p>
-								<p>
+								<!--p>
 									<label>Qty <font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-small validate[required]" style="width:30px;" disabled name="stock_qty" id="stock_qty" value="<?=$item->stock_qty?>"/> 
@@ -57,13 +57,33 @@
 									</span>
 								</p>
 								<p>
+									<label>COGS Price<font style="color:red;">*</font></label>
+									<span class="field">
+										<input type="text" class="input-xlarge validate[required]" name="stock_price" id="stock_price" value="<?=$item->stock_cogs?>"/> 
+									</span>
+								</p-->
+								<p>
 									<label>Retail Price<font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="stock_price" id="stock_price" value="<?=$item->stock_price?>"/> 
 									</span>
 								</p>
-								
 								<p>
+									<label>Status<font style="color:red;">*</font></label>
+									<span class="field">
+										<select name="stock_status" id="stock_status" style="width:200px;" class="validate[required]">
+											<option> - Select Status - </option>
+										<?php foreach($stock_status as $status): ?>
+											<option value="<?php echo $status->option_code?>"
+												<?php if ($item->stock_status == $status->option_code) echo 'selected'; ?>
+												><?php echo $status->option_desc?></option>
+										<?php endforeach; ?>
+										</select>
+									</span>
+								</p>
+								
+								
+								<!--p>
 									<label>Store ID Product<font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="store_id_product" id="store_id_product" value="<?=$item->store_id_product?>"/> 
@@ -80,7 +100,7 @@
 										<?php endforeach; ?>
 										</select>
 									</span>
-								</p>
+								</p-->
 								
 								<p class="stdformbutton">
 									<button class="btn btn-primary">SUBMIT</button>

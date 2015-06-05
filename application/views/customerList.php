@@ -1,4 +1,4 @@
-<div class="pageicon"><span class="iconfa-laptop"></span></div>
+f<div class="pageicon"><span class="iconfa-laptop"></span></div>
 <div class="pagetitle">
 		<h1>List Customer</h1>
 </div>
@@ -47,12 +47,10 @@
 					</div>
 				</form>
 				
-			
+			<h4 class="widgettitle">List Building</h4><br/>
 				<p class="stdformbutton">
 					<a href="<?=base_url()?>index.php/customer/add" title="Tambah" style = "color:#fff;" class="btn btn-success">Add Customer</a>&nbsp;
 				</p>
-			
-				<?php echo $links; ?>
 				
                 <table width="100%" class="table table-bordered" id="dyntable">
                     <colgroup>
@@ -96,10 +94,9 @@
                             <td class="center"><?=$item->billing_city?></td>
                             <td class="center"><?=$item->billing_phone?></td>
 							<td class="center"><?=$item->option_desc?></td>
-                            <td class="center"><?=$item->shipper_name?></td>
+                            <td class="center"><?=$item->ds_name?></td>
 							<td class="centeralign">
                             	<a href="<?=base_url()?>index.php/customer/update/<?=$item->billing_id?>" title="Ubah"><span class="iconsweets-create"></span></a>&nbsp;
-								<?php echo anchor('customer/delete/'.$item->billing_id,'<span class="icon-trash"></span>', array('title' => 'Hapus', 'onClick' => "return confirm('Anda yakin ingin menghapus member tersebut?')"));?>
 							</td>
                         </tr>
                         <?php endforeach; 

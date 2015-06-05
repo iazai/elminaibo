@@ -97,7 +97,7 @@
                             <td><?=$item->type_option_desc?></td>
                             <td><?=$item->liabilities_desc?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->liabilities_date))?></td>
-                            <td class="center"><?=$item->liabilities_nominal?></td>
+                            <td class="right nominal"><?=$item->liabilities_nominal?></td>
 							<td class="center"><?=$item->cause_option_desc?></td>
                             <td class="centeralign">
 								<?php 	if (!empty($item->liabilities_cause_id)) {

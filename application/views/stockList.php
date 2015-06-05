@@ -27,11 +27,24 @@
 								<li>
 									<label>Qty</label>
 									<span class="field">
-										<select name="qty_minimum" id="qty_minimum" class="input-xlarge">
+										<select name="qty_minimum" id="qty_minimum" class="input-small">
 											<option value>All</option>
 											<option value='1'>> 0</option>
 											<option value='3'>>= 3</option>
 											<option value='5'>>= 5</option>
+											
+										</select>
+									</span>
+								</li>
+								
+								<li>
+									<label>Status</label>
+									<span class="field">
+										<select name="stock_status" id="stock_status" class="input-medium">
+											<option value>All</option>
+											<option value=0>Prelaunch</option>
+											<option value=1>Active</option>
+											<option value=2>Trash</option>
 											
 										</select>
 									</span>
@@ -44,16 +57,14 @@
 					</div>
 				</form>
 					<?php $session_data = $this->session->userdata('logged_in'); ?>
-					<div style="float:left">
+					<div>
 						<?php if ($session_data['user_role'] == 'admin' || $session_data['user_role'] == 'manager') { ?>
-						<div style="float:left;">
-							<a href="<?=base_url()?>index.php/product/add" title="Add Product" style = "color:#fff;" class="btn btn-success">Add Product</a>&nbsp;
-						</div>
-
+						<a href="<?=base_url()?>index.php/product/add" title="Add Product" style = "color:#fff;" class="btn btn-success">Add Product</a>&nbsp;
+						<a href="<?=base_url()?>index.php/stock/add" title="Add Stock" style = "color:#fff;" class="btn btn-success">Add Stock</a>&nbsp;
 						<!-- edit product -->						
 						<form method="post" action="<?=base_url()?>index.php/product/update" >
 							<a href="#" id="togglefindproduct" class="btn btn-inverse" style="float:left; margin-right:10px;">Find Product</a>
-							<div id="find_product" style="display: none; float:left;">
+							<div id="find_product" style="display: none;">
 								<font style="color:blue;">Product Name</font>
 								<select name="find_product_id" id="product_id" class="input-xlarge">
 									<option value=''>Choose One</option>
@@ -64,16 +75,20 @@
 								<input type="submit" name="action" class="btn" value="Edit Product" />
 							</div>
 						</form>
+						<?php } ?>
 						<!-- end edit product -->
 						
-						<?php } ?>
-						<a href="<?=base_url()?>index.php/stock/add" title="Add Stock" style = "color:#fff;" class="btn btn-success">Add Stock</a>&nbsp;
 						<!--a href="<?=base_url()?>index.php/stock/detail" title="Detail" class="btn">Detail</a>&nbsp;-->
-						<a href="<?=base_url()?>index.php/stock/summary" title="Current Stock" class="btn btn-danger">Show Current Stock</a>&nbsp;
+						<a href="<?=base_url()?>index.php/stock/summary" style = "color:#fff;" title="Current Stock" class="btn btn-danger">Show Current Stock</a>&nbsp;
+						
 					</div>
 					<?php echo $links; ?>
 				
-				
+				<form method="post" action="<?=base_url()?>index.php/stock/push_button">
+					<?php if ($session_data['user_role'] == 'admin' || $session_data['user_role'] == 'manager') { ?>
+					<input type="submit" name="action" class="btn" value="Activate Stock" />
+					<input type="submit" name="action" class="btn" value="Move Stock into Trash" />
+					<?php } ?>
                 <table width="100%" class="table table-bordered" id="dyntable" >
                     <colgroup>
                         <col class="con0" style="align: center; width: 4%" />
@@ -90,7 +105,7 @@
                     <thead>
                         <tr>
                           	<th width="2%" class="head1 center">No</th>
-							
+							<th width="2%" class="head0 center nosort"></th>
 							<th width="15%" class="head0 center">Prod. Name - Stock Desc</th>
 							<th width="2%" class="head0 center">Free</th>
 							<th width="4%" class="head0 center">Keeped</th>
@@ -107,15 +122,28 @@
 							if ($list_stock == null) {
 							?><tr class="gradeX"><td colspan="8"><font class="no-data-tabel">Data not found</font></td></tr><?php
 							} else {
-								$i = 1;
-								foreach($list_stock as $item):?>
+								$row = 0;
+								foreach($list_stock as $item):
+									$row++;
+							?>
                         <tr class="gradeX">
 						
-							<td class="center" <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>><?=$row++;?></td>
-							
+							<td class="center" <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>><?=$row;?></td>
+							<td class="center" <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>>
+								<span class="center">
+									<input type="checkbox" name="ch<?=$row;?>" value="<?=$item->stock_id?>"/>
+								</span>
+							</td>
                             <td <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>>
 								<a href="<?=base_url()?>index.php/stock/stock_detail/<?=$item->stock_id?>" title="Detail">
-									<?=$item->product_name?> - <?=$item->stock_desc?></a>
+									<font <?php if ($item->stock_status == 0) echo 'style="color:black;"'; 
+												else if ($item->stock_status == 2) echo 'style="color:grey;"';?> >
+										<?=$item->product_name?> - <?=$item->stock_desc?>
+									</font>
+								</a>
+									<?php if (!empty($item->store_id_product)) {?>
+										<small title="asdsad"><?=$item->store_id_category_default?> - <?=$item->store_id_product?></small>
+									<?php } ?>
 							</td>
 							<td class="center"  <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>>
 								<?=$item->stock_qty?>
@@ -134,9 +162,11 @@
 								</a>
 							</td>
 							<td class="centeralign" <?php if ($item->stock_qty <= 3) echo 'style="background-color:pink;"'; ?>>
+								<?php if ($session_data['user_role'] == 'admin' || $session_data['user_role'] == 'manager') { ?>
 								<a href="<?=base_url()?>index.php/stock/restock/<?=$item->stock_id?>" title="Add Stock">Restock</a>&nbsp;
+								<?php } ?>
 								<a href="<?=base_url()?>index.php/stock/update/<?=$item->stock_id?>" title="Edit / Update"><span class="iconsweets-create"></span></a>&nbsp;
-								<?php echo anchor('stock/delete/'.$item->stock_id,'<span class="icon-trash"></span>', array('title' => 'Delete', 'onClick' => "return confirm('Are you sure about this?')"));?>
+								<!--<?php echo anchor('stock/delete/'.$item->stock_id,'<span class="icon-trash"></span>', array('title' => 'Delete', 'onClick' => "return confirm('Are you sure about this?')"));?>-->
 								
 							</td>
                         </tr>
@@ -144,6 +174,7 @@
 						}?>
                     </tbody>
                 </table>
+				</form>
 				<p><?php echo $links; ?></p>
 			
 

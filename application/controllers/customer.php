@@ -18,13 +18,7 @@ class Customer extends CI_Controller {
 		if($this->session->userdata('logged_in')) {
 			$msg  = '';
 			if ($this->input->post('is_ds') == true) {
-				$dropshipper = array (
-					'shipper_name' => $this->input->post('shipper_name'),
-					'shipper_phone' => $this->input->post('shipper_phone'),
-				);
-				$this->db->insert('shipper', $dropshipper);
-				$ds_id = $this->db->insert_id();
-			
+				
 				$billing = array(
 				   'billing_name' => $this->input->post('billing_name'),
 				   'billing_street' => $this->input->post('billing_street'),
@@ -35,7 +29,7 @@ class Customer extends CI_Controller {
 				   'billing_city' => $this->input->post('billing_city'),
 				   'billing_country' => $this->input->post('billing_country'),
 				   'billing_level' => $this->input->post('billing_level'),
-				   'dropshipper_id' => $ds_id
+				   'dropshipper_id' => $this->input->post('agent_id')
 				);
 				$this->db->insert('billing', $billing); 
 				$msg = '<p>List Building bertambah 1 beserta dropshippernya. Mantappp!</p>';
@@ -147,6 +141,12 @@ class Customer extends CI_Controller {
 			$this->db->where('option_type', 'BILL_LV');
 			$this->db->order_by('option_desc');
 			$data['billing_level'] = $this->db->get('tb_options')->result();
+			
+			// looking for agent
+			$this->db->where('billing_level', 47);
+			$this->db->order_by('billing_name');
+			$data['agents'] = $this->db->get('billing')->result();
+			
 			
 			$data['page'] = "customerAdd";
 			

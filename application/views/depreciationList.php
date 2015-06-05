@@ -89,8 +89,8 @@
 							</td>
                             <td class="center"><?=$item->ppe_age?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->ppe_date))?></td>
-                            <td class="center"><?=$item->ppe_nominal?></td>
-							<td class="center"><?=$item->depreciation_nominal?></td>
+                            <td class="right nominal"><?=$item->ppe_nominal?></td>
+							<td class="right nominal"><?=$item->depreciation_nominal?></td>
 							<td class="center"><?=$item->ppe_current_period?> <br/>
 								<small>
 									<?php echo 'Last : '.date("d-M-Y", strtotime($item->last_depreciation_date))?>

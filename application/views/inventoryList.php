@@ -13,16 +13,20 @@
 				<form method="post" action="<?=base_url()?>index.php/inventory/search">
 					<div id="wiz1step1" class="formwiz">
 						<hr>
+						<a href="<?=base_url()?>index.php/material_inventory/lists" title="Inventory Barang Mentah" class="btn">Inventory Barang Mentah</a>&nbsp;
+						<a href="<?=base_url()?>index.php/on_process_inventory/lists" title="Inventory Barang Jadi" class="btn">Inventory Barang 1/2 Jadi</a>&nbsp;
+						<a href="<?=base_url()?>index.php/inventory/lists" title="Inventory Barang Jadi" class="btn">Inventory Barang Jadi</a>&nbsp;
+						
 						<h4 class="widgettitle">&nbsp; Search</h4>
 						<div class="widgetcontent">
 							<ul class="search-field">
 								<li>
-									<label>Type</label>
+									<label>Product</label>
 									<span class="field">
-										<select name="inventory_type_id" id="inventory_type_id" class="input-xlarge">
+										<select name="product_id" id="product_id" class="input-xlarge">
 											<option value=''>Choose One</option>
-										<?php foreach($inventory_type as $type): ?>
-											<option value="<?php echo $type->option_id?>"><?php echo $type->option_desc?></option>
+										<?php foreach($products as $product): ?>
+											<option value="<?php echo $product->product_id?>"><?php echo $product->product_name?></option>
 										<?php endforeach; ?>
 										</select>
 									</span>
@@ -34,6 +38,19 @@
 										<input type="text" class="input-xlarge" name="inventory_desc" id="inventory_desc" /> 
 									</span>
 								</li>
+								
+								<li>
+									<label>Inventory Type</label>
+									<span class="field">
+										<select name="inventory_type_id" id="inventory_type_id" class="input-xlarge">
+											<option value=''>Choose One</option>
+										<?php foreach($inventory_type as $type): ?>
+											<option value="<?php echo $type->option_id?>"><?php echo $type->option_desc?></option>
+										<?php endforeach; ?>
+										</select>
+									</span>
+								</li>
+								
 							</ul>
 							<div>
 								<button class="btn btn-primary">Search</button>
@@ -46,13 +63,17 @@
 					</div>
 					<?php echo $links; ?>
 				
-                <table width="100%" class="table table-bordered" id="dyntable" style="margin-top:-185px;">
+                <table width="100%" class="table table-bordered" id="dyntable">
                     <colgroup>
                         <col class="con0" style="align: center; width: 4%" />
                         <col class="con1" />
                         <col class="con0" />
                         <col class="con1" />
                         <col class="con0" />
+                        <col class="con1" />
+						<col class="con0" />
+                        <col class="con1" />
+						<col class="con0" />
                         <col class="con1" />
 						<col class="con0" />
                     </colgroup>
@@ -63,7 +84,9 @@
 							<th width="10%" class="head1 center">Product</th>
 							<th width="18%" class="head0 center">Desc</th>
 							<th width="8%" class="head1 center">Date</th>
-                            <th width="8%" class="head0 center">Nominal</th>
+							<th width="8%" class="head0 center">QTY</th>
+							<th width="8%" class="head0 center">COGS</th>
+                            <th width="8%" class="head0 center">Total Nominal</th>
                             <th width="10%" class="head1 center">Type</th>
                         </tr>
                     </thead>
@@ -86,7 +109,9 @@
                             <td><?=$item->product_name?></td>
                             <td><?=$item->inventory_desc?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->inventory_date))?></td>
-                            <td class="center"><?=$item->inventory_nominal?></td>
+                            <td class="center"><?=$item->inventory_qty_init?></td>
+							<td class="right nominal"><?=$item->inventory_cogs?></td>
+							<td class="right nominal"><?=$item->inventory_nominal?></td>
 							<td class="center"><?=$item->option_desc?></td>
                         </tr>
                         <?php endforeach; 

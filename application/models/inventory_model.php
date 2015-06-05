@@ -10,16 +10,21 @@ class Inventory_model extends CI_Model {
 			$count=$this->db->count_all_results('tb_inventory');
 			return $count;
 		} else {
-			/** 
+			 
+			if (!empty($searchparam['product_id'])) {
+				$this->db->where('tb_product.product_id', $searchparam['product_id']);
+			}
+		
 			if ($searchparam['inventory_type_id'] != '') {
 				$this->db->where('inventory_type_id', $searchparam['inventory_type_id']);
 			} 
-			**/
 			
 			if (!empty($searchparam['inventory_desc'])) {
 				$this->db->like('inventory_desc', $searchparam['inventory_desc']);
 			}
 			
+			$this->db->join('tb_stock', 'tb_stock.stock_id = tb_inventory.stock_id','left');
+			$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id');
 			$count=$this->db->count_all_results('tb_inventory');
 			return $count;
 		}
@@ -29,11 +34,14 @@ class Inventory_model extends CI_Model {
         
 		$this->db->select('*');
 		$this->db->from('tb_inventory');
-		/**
+		
+		if (!empty($searchparam['product_id'])) {
+			$this->db->where('tb_product.product_id', $searchparam['product_id']);
+		}
+		
 		if (!empty($searchparam['inventory_type_id'])) {
 			$this->db->where('inventory_type_id', $searchparam['inventory_type_id']);
 		}
-		**/
 		
 		if (!empty($searchparam['inventory_desc'])) {
 			$this->db->like('inventory_desc', $searchparam['inventory_desc']);

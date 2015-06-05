@@ -49,15 +49,29 @@
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="stock_qty" id="stock_desc" /> 
 									</span>
-								</p>
-								<p>
+								
+								`	<label>COGS Price<font style="color:red;">*</font></label>
+									<span class="field">
+										<input type="text" class="input-xlarge validate[required]" name="stock_cogs" id="stock_cogs" /> 
+									</span>
 								`	<label>Retail Price<font style="color:red;">*</font></label>
 									<span class="field">
-										<input type="text" class="input-xlarge validate[required]" name="stock_price" id="stock_cogs" /> 
+										<input type="text" class="input-xlarge validate[required]" name="stock_price" id="stock_price" /> 
+									</span>
+								</p>
+								<p>
+									<label>Status<font style="color:red;">*</font></label>
+									<span class="field">
+										<select name="stock_status" id="stock_status" style="width:200px;" class="validate[required]">
+											<option> - Select Status - </option>
+										<?php foreach($stock_status as $status): ?>
+											<option value="<?php echo $status->option_code?>"><?php echo $status->option_desc?></option>
+										<?php endforeach; ?>
+										</select>
 									</span>
 								</p>
 								
-								<p>
+								<!--p>
 								`	<label>Store ID Product<font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="store_id_product" id="store_id_product" /> 
@@ -73,7 +87,7 @@
 										<?php endforeach; ?>
 										</select>
 									</span>
-								</p>
+								</p-->
 
 								<p class="stdformbutton">
 									<button class="btn btn-primary">SUBMIT</button>

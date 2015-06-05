@@ -1,6 +1,6 @@
 <div class="pageicon"><span class="iconfa-laptop"></span></div>
 <div class="pagetitle">
-		<h1>Perbandingan Barang Terjual dan Restock per Bulan</h1>
+		<h1>Inventory Statistic</h1>
 </div>
 			<div class="maincontentinner">
 				<div class="success message">
@@ -11,24 +11,25 @@
 				</div>
 			
 				
-			
-				<form method="post" action="<?=base_url()?>index.php/cart_stats/search_sold_restock">
-					<div id="wiz1step1" class="formwiz">
+				<a href="<?=base_url()?>index.php/cart_stats/sold_restock" title="INVENTORY STATS" class="btn">INVENTORY STATS</a>&nbsp;
+				<a href="<?=base_url()?>index.php/cart_stats/trends" title="TRENDS" class="btn">TRENDS</a>&nbsp;
+						
+				<form method="post" action="<?=base_url()?>index.php/cart_stats/sold_restock">
+					<div id="wiz1step1" class="formwiz span9">
 						<hr>
-						<a href="<?=base_url()?>index.php/cart_stats/main" title="PRODUCTS TREND" class="btn">TREN PRODUK</a>&nbsp;
-						<a href="<?=base_url()?>index.php/cart_stats/sold_restock" title="SOLD vs RESTOCK" class="btn">SOLD vs RESTOCK</a>&nbsp;
 						
 						<h4 class="widgettitle">Filter Bulan</h4>
 						<div class="widgetcontent">
 							<label>						
-								<span class="field">
-									<select name="option_id" id="option_id" style="width:200px;" class="validate[required]">
-										<option> - Bulan - </option>
-									<?php foreach($months as $month): ?>
-										<option value="<?php echo $month->option_code?>"><?php echo $month->option_desc?></option>
-									<?php endforeach; ?>
-									</select>
+								<span class="field" style="padding-right:5px;padding-bottom:5px;float:left;">
+									<div id="datepicker" style="border: 1px solid #0c57a3;"></div>
 								</span>
+								
+								<span class="field">
+									<input type="text" id="startdate" name="startdate" placeholder="Range Awal">
+									<input type="text" id="enddate" name="enddate" placeholder="Range Akhir">
+								</span>
+								
 								<span class="field">
 									<select name="product_id" id="product_id" style="width:200px;" class="validate[required]">
 										<option> - Produk - </option>
@@ -38,54 +39,297 @@
 									</select>
 								</span>
 								
-								<button class="btn btn-primary">SUBMIT</button>
+								<p class="field">
+									<button class="btn btn-primary">SUBMIT</button>
+								</p>
+							<div class="clear"></div>
 							</label>
 						</div>
 					</div>
 				</form>
 				
-				<table width="100%" class="table table-bordered" id="rosetatable">
-                    <colgroup>
-                        <col class="con0" style="align: center; width: 4%" />
-                        <col class="con1" />
-						<col class="con0" />
-                    </colgroup>
-                    <thead>
-                        <tr>
-                          	<th width="3%" class="center">No</th>
-							<th width="25%" class="center">Product Name</th>
-							<th width="10%" class="center">Sold Qty</th>
-							<th width="10%" class="center">Restock Qty</th>
-							<th width="10%" class="center">Free Qty</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-					<?php 
-						$row = 1;
-						if ($list_monthly_sold_cart == null) {
-						?>
-						<tr class="gradeX">
-							<td class="center"  colspan='5'><font class="no-data-tabel">No Sales!<font></td>
-                        </tr>
-					   <?php 
-						} else {
-							foreach ($list_monthly_sold_cart as $item) {?>
-						<tr class="gradeX">
-							<td class="center"><?=$row++;?></td>
-					        <td><?=$item->product_name?> - <?=$item->stock_desc?></td>
-							<td class="center sold"><?=$item->sold_qty?></td>
-							<td class="center sold"><?=$item->restock_qty?></td>
-							<td class="center sold"><?=$item->stock_qty?></td>
-                        </tr>
-					   <?php }} ?>
-					   
-						<tr class="gradeX">
-						    <td class="center" colspan="2">Total : </td>
-							<td class="center"><?=$total_sold_qty?></td>
-							<td class="center"><?=$total_restock_qty?></td>
-					    </tr>
-                    </tbody>
-                </table>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+						
+							<tr>
+								<th class="center" colspan="3" style="background-color: #0866C5;">
+									<?=date("d M Y")?>
+								</th>
+							</tr>
+							<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Free Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >All</td>
+								<td class="center">
+									<?=$total_free_qty?>
+								</td>
+								<td class="center nominal">
+									<?=$total_free_nominal?>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th class="center" colspan="3" style="background-color: #0866C5;">
+									<?php if ($startdate != '1970-01-01') echo date("d M Y", strtotime($startdate)).' - '.date("d M Y", strtotime($enddate));
+											else echo 'ALL TIME (valid on June)';
+									?>
+								</th>
+							</tr>
+							<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Sold Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >All</td>
+								<td class="center">
+									<?=$total_sold_qty?>
+								</td>
+								<td class="center nominal">
+									<?=$total_sold_nominal?>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th class="center" colspan="3" style="background-color: #0866C5;">
+									
+									<?php if ($startdate != '1970-01-01') echo date("d M Y", strtotime($startdate)).' - '.date("d M Y", strtotime($enddate));
+											else echo 'ALL TIME (valid on June)';
+									?>
+								</th>
+							</tr>
+								<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Restock Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >All</td>
+								<td class="center">
+									<?=$total_restock_qty?>
+								</td>
+								<td class="center nominal">
+									<?=$total_restock_nominal?>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="span9">
+					<hr/>
+				</div>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Free Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Sold Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="span3">
+					<table width="100%" class="table table-bordered" id="rosetatable">
+						<colgroup>
+							<col class="con0" style="align: center; width: 4%" />
+							<col class="con1" />
+							<col class="con1" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th width="5%" class="center" rowspan="2">Product Name</th>
+								<th width="20%" class="center" colspan="2">Restock Qty</th>
+							</tr>
+							<tr>
+								<th width="20%" class="center">Qty</th>
+								<th width="20%" class="center">Nominal</th>
+							</tr>
+						</thead>
+						<tbody>
+						
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+							<tr class="gradeX">
+								<td class="center" >Kaira 115</td>
+								<td class="center">
+								
+									100 pcs 
+								</td>
+								<td class="center">
+								
+									Rp. 100.000
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 				
 <script> 
 	
@@ -116,4 +360,39 @@
 			
 		$('#totalrestock').text('Total Restock : ' + sum);
 	};
+</script>
+
+<style type="text/css">
+		.dp-highlight .ui-state-default {
+			background: #478DD5;
+			color: #FFF;
+		}
+</style>
+<script type="text/javascript">
+		/*
+		 * jQuery UI Datepicker: Using Datepicker to Select Date Range
+		 * http://salman-w.blogspot.com/2013/01/jquery-ui-datepicker-examples.html
+		 */
+		 
+		$(function() {
+			$("#datepicker").datepicker({
+				beforeShowDay: function(date) {
+					var date1 = $.datepicker.parseDate($.datepicker._defaults.dateFormat, $("#startdate").val());
+					var date2 = $.datepicker.parseDate($.datepicker._defaults.dateFormat, $("#enddate").val());
+					return [true, date1 && ((date.getTime() == date1.getTime()) || (date2 && date >= date1 && date <= date2)) ? "dp-highlight" : ""];
+				},
+				onSelect: function(dateText, inst) {
+					var date1 = $.datepicker.parseDate($.datepicker._defaults.dateFormat, $("#startdate").val());
+					var date2 = $.datepicker.parseDate($.datepicker._defaults.dateFormat, $("#enddate").val());
+					if (!date1 || date2) {
+						$("#startdate").val(dateText);
+						$("#enddate").val("");
+						$(this).datepicker("option", "minDate", dateText);
+					} else {
+						$("#enddate").val(dateText);
+						$(this).datepicker("option", "minDate", null);
+					}
+				}
+			});
+		});
 </script>

@@ -51,7 +51,7 @@ class CashflowModel extends CI_Model
 		
 		$this->db->join('cashflow_type', 'cashflow.cashflow_type_id = cashflow_type.id');
 		$this->db->join('bank_account', 'cashflow.bank_account_id = bank_account.id');
-		$this->db->order_by("cashflow.cashflow_date", "desc");
+		$this->db->order_by("cashflow.cashflow_id", "desc");
 		$this->db->limit($limit, $start);
 		$query=$this->db->get();
 		

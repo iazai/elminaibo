@@ -36,7 +36,7 @@ class Liabilities extends CI_Controller {
 			$config = array();
 			$config["base_url"] = base_url("index.php/liabilities/lists");
 			$config["total_rows"] = $this->liabilities_model->record_count($searchterm);
-			$config["per_page"] = 20;
+			$config["per_page"] = 50;
 			
 			$this->pagination->initialize($config);
 			$page = $this->uri->segment(3);
@@ -56,7 +56,7 @@ class Liabilities extends CI_Controller {
 		if($this->session->userdata('logged_in')) {
 		
 			$msg = "";
-			// insert into liabilities
+			// INSERT INTO LIABILITIES
 			$liabilities = array(
 				   'liabilities_date' => date('Y-m-d', strtotime($this->input->post('liabilities_date'))),
 				   'liabilities_desc' => $this->input->post('liabilities_desc'),
@@ -79,6 +79,8 @@ class Liabilities extends CI_Controller {
 				);
 			$this->db->insert('tb_cash', $cash);
 			$msg .= '<p>Cash from ('.$this->input->post('liabilities_desc').') has been added..!</p>';
+			
+			
 			
 			$this->session->set_flashdata('success_message',$msg);
 						
@@ -220,9 +222,18 @@ class Liabilities extends CI_Controller {
 	public function money_repaid() {
 		if($this->session->userdata('logged_in')) {
 			
-			$this->db->where('option_code', 'MON_REP');
+			$this->db->where('option_type', 'LIABILITY');
 			$this->db->order_by('option_desc');
-			$data['liabilities_type'] = $this->db->get('tb_options')->result();
+			$data['liability_type'] = $this->db->get('tb_options')->result();
+			
+			$this->db->where('option_type', 'EXP');
+			$this->db->order_by('option_desc');
+			$data['expense_type'] = $this->db->get('tb_options')->result();
+			
+			$this->db->where('option_type', 'ASSET');
+			$this->db->where('option_root_id', 1);
+			$this->db->order_by('option_desc');
+			$data['asset_type'] = $this->db->get('tb_options')->result();
 			
 			$this->db->order_by('bank_account_name');
 			$data['bank_account'] = $this->db->get('bank_account')->result();
@@ -272,26 +283,45 @@ class Liabilities extends CI_Controller {
 			$msg = "";
 			// REDUCE LIABILITY
 			$liabilities = array(
-				   'liabilities_date' => date('Y-m-d', strtotime($this->input->post('liabilities_date'))),
-				   'liabilities_desc' => $this->input->post('liabilities_desc'),
-				   'liabilities_nominal' => '-'.$this->input->post('liabilities_nominal'),
-				   'liabilities_type_id' => $this->input->post('liabilities_type_id')
+				   'liabilities_date' => date('Y-m-d', strtotime($this->input->post('repaid_date'))),
+				   'liabilities_desc' => $this->input->post('repaid_desc'),
+				   'liabilities_nominal' => '-'.$this->input->post('repaid_nominal'),
+				   'liabilities_type_id' => $this->input->post('liabilities_type_id'),
+				   'liabilities_cause_id' => $this->input->post('repaid_type_id')
 				);
 			$this->db->insert('tb_liabilities', $liabilities);
-			$msg .= '<p>Liabilities ('.$this->input->post('liabilities_desc').') has been repaid..!</p>';
+			$msg .= '<p>Liabilities ('.$this->input->post('repaid_desc').') has been repaid.</p>';
 			$liabilities_id = $this->db->insert_id();
 			
-			// REDUCE CASH
-			$cash = array(
-				   'cash_date' => date('Y-m-d', strtotime($this->input->post('liabilities_date'))),
-				   'cash_desc' => $this->input->post('liabilities_desc'),
-				   'cash_nominal' => '-'.$this->input->post('liabilities_nominal'),
-				   'cash_type_id' => $this->input->post('liabilities_type_id'),
-				   'bank_account_id' => $this->input->post('bank_account_id'),
-				   'liabilities_id' => $liabilities_id
-				);
-			$this->db->insert('tb_cash', $cash);
-			$msg .= '<p>Cash from ('.$this->input->post('liabilities_desc').') has been reduced for money repaid..!</p>';
+			// REDUCE ASSET
+			
+			// IF PAID BY CASH :
+			if ($this->input->post('asset_code') == 'CASH') {
+				$cash = array(
+					   'cash_date' => date('Y-m-d', strtotime($this->input->post('repaid_date'))),
+					   'cash_desc' => $this->input->post('repaid_desc'),
+					   'cash_nominal' => '-'.$this->input->post('repaid_nominal'),
+					   'cash_type_id' => $this->input->post('repaid_type_id'),
+					   'bank_account_id' => $this->input->post('bank_account_id'),
+					   'liabilities_id' => $liabilities_id
+					);
+				$this->db->insert('tb_cash', $cash);
+				$msg .= '<p>Cash from ('.$this->input->post('repaid_desc').') has been reduced for money repaid.</p>';
+			}
+			
+			// IF PAID BY ACCOUNT RECEIVABLE :
+			
+			// ACREC Berkurang
+			if ($this->input->post('asset_code') == 'ACT_REC') {
+				$acrec = array(
+					   'acrec_date' => date('Y-m-d', strtotime($this->input->post('repaid_date'))),
+					   'acrec_desc' => 'Money Repaid : '.$this->input->post('repaid_desc'),
+					   'acrec_nominal' => '-'.$this->input->post('repaid_nominal'),
+					   'acrec_type_id' => $this->input->post('repaid_type_id')
+					);
+				$this->db->insert('tb_acrec', $acrec);
+				$msg .= '<p>Account Receivable from ('.$this->input->post('repaid_desc').') has been reduced for paid the liabilities.</p>';
+			}
 			
 			$this->session->set_flashdata('success_message',$msg);
 						

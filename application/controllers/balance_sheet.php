@@ -43,8 +43,19 @@ class Balance_sheet extends CI_Controller {
 			$account_receivable = $this->get_account_receivable_list();
 			$cash = $this->get_cash_list();
 			
+			$inventory_barang_mentah = 0;
+			$inventory_barang_setengah_jadi = 0;
+			$inventory_barang_jadi = $this->get_inventory_barang_jadi();
+			
+			
 			$data["account_receivable"] = $account_receivable;
 			$data["cash"] = $cash;
+			
+			$data["inventory_barang_mentah"] = $inventory_barang_mentah;
+			$data["inventory_barang_setengah_jadi"] = $inventory_barang_setengah_jadi;
+			$data["inventory_barang_jadi"] = $inventory_barang_jadi;
+			
+			
 			
 			
 			// LIABILITIES
@@ -53,6 +64,15 @@ class Balance_sheet extends CI_Controller {
 			
 			$data["money_repaid_nominal"] = $money_repaid_nominal;
 			$data["account_payable"] = $account_payable;
+
+			// EARNING / PROFIT
+			$sales_nominal = $this->get_sales_nominal();
+			$cogs_nominal = $this->get_cogs_nominal();
+			$ongkir_nominal = $this->get_ongkir_nominal();
+			$expense_nominal = $this->get_expense_nominal();
+			
+			$earnings = $sales_nominal + $cogs_nominal + $ongkir_nominal - $expense_nominal;
+			$data["earnings_nominal"] = 0; //$earnings;
 			
 			$data["page"] = "balanceSheet";
 			
@@ -68,7 +88,7 @@ class Balance_sheet extends CI_Controller {
 		$this->db->select('liabilities_type_id,liabilities_cause_id, option_desc, sum(liabilities_nominal) as liabilities_nominal');
 		$this->db->from('tb_liabilities');
 		
-		$this->db->where('liabilities_type_id',8); // sedekah
+		$this->db->where('liabilities_type_id',8); // acc payable
 		$this->db->join('tb_options', 'tb_liabilities.liabilities_cause_id = tb_options.option_id','left');
 		$this->db->group_by('liabilities_cause_id');
 		
@@ -120,6 +140,25 @@ class Balance_sheet extends CI_Controller {
 		return false;
 	}
 	
+	private function get_inventory_barang_jadi() {
+		$this->db->select('sum(tb_inventory.inventory_cogs * tb_inventory.inventory_qty) as nominal');
+		$this->db->from('tb_inventory');
+				
+		$this->db->join('tb_stock', 'tb_stock.stock_id = tb_inventory.stock_id');
+		$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id');
+		$this->db->where('tb_product.status', 1);
+				
+		$query = $this->db->get();
+			
+		if ($query->num_rows() > 0) {
+			foreach ($query->result() as $row) {
+				$total_free_nominal = $row->nominal;
+			}
+			return $total_free_nominal;
+		}
+		return false;
+	}
+	
 	private function get_cash_list() {
 		
 		$this->db->select('bank_account_name, sum(cash_nominal) as nominal');
@@ -136,6 +175,61 @@ class Balance_sheet extends CI_Controller {
 			return $data;
 		}
 		return false;
+	}
+	
+	private function get_sales_nominal() {
+		// range date
+		
+		//$this->db->where_in('liabilities_type_id',84); // money repaid
+		$query = $this->db->get('orders');
+		
+		$sum_nominal = 0;
+		if ($query->num_rows > 0) {
+			foreach ($query->result() AS $item) {
+				$sum_nominal = $sum_nominal + ($item->product_amount - $item->discount_amount);
+			}
+		}
+		return $sum_nominal;			
+	}
+	
+	private function get_ongkir_nominal() {
+		
+		$query = $this->db->get('orders');
+		$sum_nominal = '';
+		if ($query->num_rows > 0) {
+			foreach ($query->result() AS $item) {
+				$sum_nominal = $sum_nominal + ($item->exp_cost);
+			}
+		}
+		return $sum_nominal;			
+	}
+	
+	private function get_cogs_nominal() {
+		
+		$this->db->where_in('inventory_type_id',24); // INV_SOLD
+		$query = $this->db->get('tb_inventory');
+		
+		$sum_nominal = '';
+		if ($query->num_rows > 0) {
+			foreach ($query->result() AS $item) {
+				$sum_nominal = $sum_nominal + $item->inventory_nominal;
+			}
+		}
+		return $sum_nominal;			
+	}
+	
+	private function get_expense_nominal() {
+		
+		$this->db->where('expense_type_id <>',43); // sedekah
+		$query = $this->db->get('tb_expense');
+		
+		$sum_nominal = '';
+		if ($query->num_rows > 0) {
+			foreach ($query->result() AS $item) {
+				$sum_nominal = $sum_nominal + $item->expense_nominal;
+			}
+		}
+		return $sum_nominal;			
 	}
 	
 	public function arrayToObject($d) {

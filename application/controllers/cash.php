@@ -75,16 +75,62 @@ class Cash extends CI_Controller {
 			$data['bank_account'] = $this->db->get('bank_account')->result();
 			
 			// SEARCHING TERMS
+			$cash_type_id = '';
+			$cash_desc = '';
+			$bank_account_id = '';
+			$startdate = '2015-01-01';
+			
 			$searchterm = $this->session->userdata('searchterm');
+			if ($searchterm != null){
+				
+				if (!empty($searchterm['cash_type_id'])) {
+					$cash_type_id = $searchterm['cash_type_id'];
+				}
+				
+				if (!empty($searchterm['cash_desc'])) {
+					$cash_desc = $searchterm['cash_desc'];
+				}
+				
+				if (!empty($searchterm['bank_account_id'])) {
+					$bank_account_id = $searchterm['bank_account_id'];
+				}
+				
+				if (!empty($searchterm['startdate'])) {
+					$startdate = $searchterm['startdate'];
+				}
+			}			
+			
+			$data['startdate'] = $startdate;
 			
 			// Paging
 			$config = array();
 			$config["base_url"] = base_url("index.php/cash/lists");
 			$config["total_rows"] = $this->cash_model->record_count($searchterm);
-			$config["per_page"] = 20;
+			$config["per_page"] = 100;
 			
 			$this->pagination->initialize($config);
 			$page = $this->uri->segment(3);
+			
+			// QUERY SALDO AWAL
+			$this->db->select('sum(cash_nominal) as balance');
+			$this->db->from('tb_cash');
+			
+			if ($cash_type_id != '') {
+				$this->db->where('cash_type_id', $cash_type_id);
+			}
+			if ($cash_desc != '') {
+				$this->db->like('cash_desc', $cash_desc);
+			}
+			if ($bank_account_id != '') {
+				$this->db->where('bank_account_id', $bank_account_id);
+			}
+			if ($startdate != '') {
+				$this->db->where('cash_date <', $startdate);
+			}
+			
+			$this->db->limit(1);
+			$cash = $this->db->get();
+			$data['first_balance'] = $cash->row()->balance;
 			
 			$data["list_cash"] = $this->cash_model->fetch_cash($config["per_page"], $page, $searchterm);
 			$data["links"] = $this->pagination->create_links();
@@ -101,6 +147,7 @@ class Cash extends CI_Controller {
 		if($this->session->userdata('logged_in')) {	
 			$this->session->unset_userdata('searchterm');
 			
+			
 			$period = $this->uri->segment(3);
 			$cash_type_id = $this->uri->segment(4);
 			$searchparam = null;
@@ -115,8 +162,11 @@ class Cash extends CI_Controller {
 					   'cash_type_id' => $this->input->post('cash_type_id'),
 					   'cash_desc' => $this->input->post('cash_desc'),
 					   'bank_account_id' => $this->input->post('bank_account_id'),
+					   'startdate' => date('Y-m-d', strtotime($this->input->post('startdate'))),
+					   'enddate' => date('Y-m-d', strtotime($this->input->post('enddate'))),
 				);
 			}
+			
 			
 			$this->GenericModel->searchterm_handler($searchparam);
 			

@@ -24,19 +24,25 @@
 									<li>
 										<label>Nama Penerima</label>
 										<span class="field">
-											<input type="text" class="input-xlarge" name="billing_name" id="billing_name" />
+											<input type="text" class="input-medium" name="billing_name" id="billing_name" />
 										</span>
 									</li>
 									<li>
 										<label>Telp Penerima</label>
 										<span class="field">
-											<input type="text" class="input-xlarge" name="billing_phone" id="billing_phone" />
+											<input type="text" class="input-medium" name="billing_phone" id="billing_phone" />
 										</span>
 									</li>
 									<li>
 										<label>Kecamatan</label>
 										<span class="field">
-											<input type="text" class="input-xlarge" name="billing_kec" id="billing_kec" />
+											<input type="text" class="input-medium" name="billing_kec" id="billing_kec" />
+										</span>
+									</li>
+									<li>
+										<label>Kota</label>
+										<span class="field">
+											<input type="text" class="input-medium" name="billing_city" id="billing_city" />
 										</span>
 									</li>
 								</ul>	
@@ -83,16 +89,14 @@
 						<thead>
 							<tr>
 								<th class="head1 center">No</th>
-								<th class="head0 center nosort"><input type="checkbox" class="checkall" /></th>
+								<th class="head0 center nosort"></th>
 								<th class="head1 center">Penerima</th>
 								<th class="head1 center">Tanggal Order</th>
 								<th class="head1 center">Order Via</th>
 								<th class="head1 center">Eksp</th>
 								<th class="head0 center">Daerah</th>
-								<th class="head1 center">Belanja</th>
-								<th class="head1 center">Diskon</th>
-								<th class="head0 center">Ongkir</th>
-								<th class="head0 center">Total</th>
+								<th class="head1 center" width="15%">Subtotal</th>
+								<th class="head0 center" width="10%">Total</th>
 								<th class="head1 center">Status Bayar</th>
 								<th class="head1 center">Status Kirim</th>
 								<th class="head0 center">Action</th>
@@ -117,7 +121,7 @@
 								</td>
 								<td>
 									<a href="<?=base_url()?>index.php/order/cetak_nota_dan_alamat/<?=$order->id?>" title="Detail">
-										<?=$order->billing_name?> <br/>
+										<?=$order->bill_name?> <br/>
 										<a href="<?=base_url()?>index.php/order/update/<?=$order->id?>" title="Ubah"><span class="iconsweets-create"></span></a>&nbsp;
 								<?php echo anchor('order/delete/'.$order->id,'<span class="icon-trash"></span>', array('title' => 'Hapus', 'onClick' => "return confirm('Anda yakin ingin menghapus order tersebut?')"));?>
 									</a>
@@ -125,22 +129,53 @@
 								<td class="center"><?php echo date("d-M-Y", strtotime($order->order_date))?></td>
 								<td class="center"><?=$order->option_desc?></td>
 								<td class="center"><?=$order->expedition?> <br/><b><small><?=$order->estimated_weight?> gr</small></b></td>
-								<td class="center"><?=$order->billing_kec?>,&nbsp; <?=$order->billing_city?></td>
-								<td class="center"><?=$order->product_amount?></td> 
-								<td class="center"><?=$order->discount_amount?></td>
-								<td class="center"><?=$order->exp_cost?></td>
-								<td class="center"><?=$order->total_amount?></td>
+								<td class="center"><?=$order->bill_kec?>,&nbsp; <?=$order->bill_city?></td>
+								<td class="">
+									Belanja : <b class="right nominal"><?=$order->product_amount - $order->discount_amount?></b><br/>
+									Penyesuaian : <b class="right nominal"><?=$order->adjustment_nominal?></b><br/>
+									Ongkir : <b class="right nominal"><?=$order->exp_cost?></b><br/>
+								<td class="right nominal"><?=$order->total_amount?></td>
 								<td class="center"><?php 	if ($order->order_status == 2) {
 																echo '<font color="lime">Lunas</font>';
 															} else if ($order->order_status == 1){ 
+																// get cash
+																$this->db->where('order_id', $order->id);
+																$this->db->limit(1);
+																$cash = $this->db->get('tb_cash');
+																if ($cash->num_rows > 0) {
+																	$cash_nominal = $cash->row()->cash_nominal;
+																} else {
+																	$cash_nominal = 0;
+																}
+																// get acrec
+																$this->db->where('order_id', $order->id);
+																$this->db->limit(1);
+																$acrec = $this->db->get('tb_acrec');
+																if ($acrec->num_rows > 0) {
+																	$acrec_nominal = $acrec->row()->acrec_nominal;
+																} else {
+																	$acrec_nominal = 0;
+																}
 																echo '<font color="blue">
-																		DP : '.$order->purchase_nominal_cash.'<br/>
-																		Sisa : '.$order->purchase_nominal_credit.'
+																		DP : '.$cash_nominal.'<br/>
+																		Sisa : '.$acrec_nominal.'
 																	 </font>';
 															} else {
 																echo '<font color="red">Belum</font>';
 															}
 													?>
+									<br/>
+									<?php
+																	
+										// get wallet
+										$this->db->where('order_id', $order->id);
+										$wallet = $this->db->get('tb_wallet');
+										if ($wallet->num_rows > 0) {
+											echo '<small>Wallet</small>';
+										} else {
+											echo '<small>ATM Transfer</small>';
+										}
+									?>
 								</td>
 								<td class="center"><?php if ($order->package_status == 1) 
 															echo '<font color="lime">Sudah</font>';else echo '<font color="red">Belum</font>';?></td>
@@ -192,7 +227,7 @@
 							?><tr class="gradeX"><td colspan="8"><font class="no-data-tabel">Data tidak ditemukan</font></td></tr><?php
 							} else {
 						
-							$i = 1;
+							$row = 1;
 							foreach($listOrderComplete as $order):?>
                         <tr class="gradeX">
 						
@@ -204,15 +239,15 @@
 							</td>
                             <td>
 								<a href="<?=base_url()?>index.php/order/cetak_nota_dan_alamat/<?=$order->id?>" title="Detail">
-									<?=$order->billing_name?>
-								</a>
+									<?=$order->bill_name?>
+								</a><br/>
 							</td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($order->order_date))?></td>
                             <td class="center"><?=$order->billing_kec?>,&nbsp; <?=$order->billing_city?></td>
-                            <td class="center"><?=$order->product_amount?></td> 
-							<td class="center"><?=$order->discount_amount?></td>
-							<td class="center"><?=$order->exp_cost?></td>
-							<td class="center"><?=$order->total_amount?></td>
+                            <td class="right nominal"><?=$order->product_amount?></td> 
+							<td class="right nominal"><?=$order->discount_amount?></td>
+							<td class="right nominal"><?=$order->exp_cost?></td>
+							<td class="right nominal"><?=$order->total_amount?></td>
 							<td class="center"><?php 
 													if ($order->order_status == 2) {
 														echo '<font color="lime">Lunas</font>';
@@ -224,7 +259,21 @@
 													} else {
 														echo '<font color="red">Belum</font>';
 													}
-													?></td>
+													?>
+							
+									<br/>
+									<?php
+																	
+										// get wallet
+										$this->db->where('order_id', $order->id);
+										$wallet = $this->db->get('tb_wallet');
+										if ($wallet->num_rows > 0) {
+											echo '<small>Wallet</small>';
+										} else {
+											echo '<small>ATM Transfer</small>';
+										}
+									?>									
+							</td>
 							<td class="center"><?php if ($order->package_status == 1) 
 														echo '<font color="lime">Sudah</font>';else echo '<font color="red">Belum</font>';?></td>
                             <td class="centeralign">

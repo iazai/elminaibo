@@ -13,7 +13,9 @@
 				<hr/>
 				<p class="stdformbutton">
 						<a href="<?=base_url()?>index.php/stock/summary" class="btn">BACK</a>&nbsp;
+<?php if (!empty($session_data['user_role'])) {?>
 						<a href="<?=base_url()?>index.php/stock/lists" class="btn">Stock List</a>&nbsp;
+<?php } ?>
 				</p>
 				<hr/>
 				<div>

@@ -78,7 +78,7 @@
                             <td><?=$item->option_desc?></td>
                             <td><?=$item->acrec_desc?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->acrec_date))?></td>
-                            <td class="center"><?=$item->acrec_nominal?></td>
+                            <td class="right nominal"><?=$item->acrec_nominal?></td>
                             <td class="centeralign">
 								<?php 
 									if ($item->acrec_type_id == 23) {

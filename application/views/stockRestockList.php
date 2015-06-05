@@ -31,6 +31,7 @@
                           	<th width="3%" class="head1 center">No</th>
 							<th width="8%" class="head1 center">Restock Date</th>
 							<th width="5%" class="head0 center">QTY</th>
+							<th width="5%" class="head0 center">COGS</th>
 							<th width="5%" class="head0 center">Action</th>
                         </tr>
                     </thead>
@@ -46,7 +47,9 @@
 						
 							<td class="center"><?=$i++;?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->inventory_date))?></td>
-							<td class="center"><?=$item->stock_qty?></td>
+							<td class="center">Restock : <?=$item->inventory_qty_init?><br/>
+												<small>Avail. : <?=$item->inventory_qty?></small></td>
+							<td class="center"><?=$item->inventory_cogs?></td>
 							<td class="centeralign">
 								<a href="<?=base_url()?>index.php/stock/undo_restock/<?=$item->inventory_id?>" title="Undo Restock">Undo</a>&nbsp;
 							</td>	

@@ -42,14 +42,19 @@
                         <tr>
                           	<th width="3%" class=" center">No</th>
 							<th width="7%" class=" center">Transaction/Event</th>
-							<th width="5%" class=" center">CASH</th>
+							<th width="5%" class=" center">BCA</th>
+							<th width="5%" class=" center">MANDIRI</th>
+							<th width="5%" class=" center">BRI</th>
+							<th width="5%" class=" center">BNI</th>
+							<th width="5%" class=" center">RUSYDI</th>
+							<th width="5%" class=" center">DIAZ</th>
 							<th width="5%" class=" center">Account Receivable</th>
 							<th width="5%" class=" center">Inventory</th>
                             <th width="5%" class=" center">PPE</th>
 							<th width="2%" class=" center"></th>
                             <th width="5%" class="center">Account Payable</th>
-							<th width="5%" class="head1 center">Tax Payable</th>
-							<th width="5%" class="head0 center">Notes Payable</th>
+							<th width="5%" class="head1 center">Rusydi Payable</th>
+							<th width="5%" class="head0 center">Diaz Payable</th>
                             <th width="2%" class="head0 center"></th>
 							<th width="5%" class="head0 center">Common Stock</th>
 							<th width="5%" class="head1 center">Retain Earning</th>
@@ -63,15 +68,21 @@
 						<tr class="gradeX">
 							<td class="center"><?=$row++;?></td>
 					        <td><?=$item->option_desc?></td>
-							<td class="center cash"><?=$item->cash?></td>
+							<!--td class="center cash"><?=$item->cash?></td><!-- CASH -->
+							<td class="center bca"><?=$item->bca?></td><!-- CASH -->
+							<td class="center mandiri"><?=$item->mandiri?></td><!-- CASH -->
+							<td class="center bri"><?=$item->bri?></td><!-- CASH -->
+							<td class="center bni"><?=$item->bni?></td><!-- CASH -->
+							<td class="center rusydi"><?=$item->rusydi?></td><!-- CASH -->
+							<td class="center diaz"><?=$item->diaz?></td><!-- CASH -->
 							
                     		<td class="center acc_rec"><?=$item->acc_rec?></td>
 							<td class="center inventory"><?=$item->inventory?></td>
 							<td class="center netppe"><?=$item->ppe?></td>
 							<td class="center" style="background-color:#eee;"></td>
 							<td class="center ap"><?=$item->account_pay?></td>
-							<td class="center rp"><?=$item->tax_pay?></td>
-							<td class="center dp"><?=$item->notes_pay?></td>
+							<td class="center rp"><?=$item->rusydi_pay?></td>
+							<td class="center dp"><?=$item->diaz_pay?></td>
 							<td class="center" style="background-color:#eee;"></td>
 							<td class="center equity"><?=$item->equity?></td>
 							<td class="center income"><?=$item->income?></td>
@@ -80,14 +91,22 @@
                         <tr class="gradeX" style="background-color:#eee;">
 							<td class="center"></td>
 					        <td>BALANCE</td>
-                    		<td class="center" id="totalcash"></td>
+                    		<!--td class="center" id="totalcash"></td-->
+							
+							<td class="center" id="totalbca"></td>
+							<td class="center" id="totalmandiri"></td>
+							<td class="center" id="totalbri"></td>
+							<td class="center" id="totalbni"></td>
+							<td class="center" id="totalrusydi"></td>
+							<td class="center" id="totaldiaz"></td>
+							
 							<td class="center" id="totalar"></td>
 							<td class="center" id="totalinventory"></td>
 							<td class="center" id="totalnetppe"></td>
 							<td class="center"></td>
 							<td class="center" id="totalap"></td>
-							<td class="center" id="totaltp"></td>
-							<td class="center" id="totalnp"></td>
+							<td class="center" id="totalrp"></td>
+							<td class="center" id="totaldp"></td>
 							<td class="center"></td>
 							<td class="center" id="totalequity"></td>
 							<td class="center" id="totalincome"></td>
@@ -145,6 +164,89 @@
 		$('#totalcash').text(sum);
 	};
 	
+	$(calculatebca);
+	function calculatebca() {
+		var sum = 0;
+		
+		$(".bca").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totalbca').text(sum);
+	};
+	
+	$(calculatebri);
+	function calculatebri() {
+		var sum = 0;
+		
+		$(".bri").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totalbri').text(sum);
+	};
+	
+	$(calculatemandiri);
+	function calculatemandiri() {
+		var sum = 0;
+		
+		$(".mandiri").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totalmandiri').text(sum);
+	};
+	
+	$(calculatebni);
+	function calculatebni() {
+		var sum = 0;
+		
+		$(".bni").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totalbni').text(sum);
+	};
+	
+	$(calculaterusydi);
+	function calculaterusydi() {
+		var sum = 0;
+		
+		$(".rusydi").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totalrusydi').text(sum);
+	};
+	
+	$(calculatediaz);
+	function calculatediaz() {
+		var sum = 0;
+		
+		$(".diaz").each(function() {
+				var value = $(this).text();
+				if (!isNaN(value) && value.length != 0) {
+					sum += parseFloat(value);
+				}
+			});
+			
+		$('#totaldiaz').text(sum);
+	};
 
 	$(calculatear);
 	

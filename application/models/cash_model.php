@@ -53,10 +53,20 @@ class Cash_model extends CI_Model {
 			$this->db->where('bank_account_id', $searchparam['bank_account_id']);
 		}
 		
+		if (!empty($searchparam['bank_account_id'])) {
+			$this->db->where('bank_account_id', $searchparam['bank_account_id']);
+		}
+		
+		if (!empty($searchparam['startdate']) && $searchparam['startdate'] != '1970-01-01' && 
+			!empty($searchparam['enddate']) && $searchparam['enddate'] != '1970-01-01') {
+			$this->db->where('cash_date >=',$searchparam['startdate']);
+			$this->db->where('cash_date <=',$searchparam['enddate']);
+		}
+		
 		$this->db->join('tb_options', 'tb_cash.cash_type_id = tb_options.option_id','left');
 		$this->db->join('bank_account', 'tb_cash.bank_account_id = bank_account.id','left');
-		$this->db->order_by("tb_cash.cash_date", "desc");
-		$this->db->limit($limit, $start);
+		$this->db->order_by("tb_cash.cash_date", "asc");
+		//$this->db->limit($limit, $start);
 		$query=$this->db->get();
 		
 		if ($query->num_rows() > 0) {

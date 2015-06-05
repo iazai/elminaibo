@@ -28,7 +28,5 @@
 <div class="mainwrapper">
     
     <div class="header">
-        <div class="logo">
-            <a href="<?=base_url()?>index.php/"><img src="<?=base_url()?>assets/images/logo.png" alt="" /></a>
-        </div>
+        
     </div>

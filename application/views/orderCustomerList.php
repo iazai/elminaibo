@@ -15,8 +15,10 @@
 							echo $this->session->flashdata('error_message');
 						?>
 					</div>
+					<hr/>
 					<div>
-					<a href="<?=base_url()?>index.php/order" title="Back" style = "color:#fff;" class="btn btn-success">Back</a>&nbsp;
+						<a href="<?=base_url()?>index.php/order" title="Back to Order" style = "color:blue;" class="btn">Back to Order</a>&nbsp;
+						<a href="<?=base_url()?>index.php/customer_stats/customer_rank" title="Back to Cust. Rank" style = "color:blue;" class="btn">Back to Cust. Rank</a>&nbsp;
 					</div>
 				
 				<form method="post" action="<?=base_url()?>index.php/order/choose_customer">
@@ -65,8 +67,6 @@
                     </tbody>
 				</form>
 				
-					<p><?php echo $links; ?></p>
-				
 					<table width="100%" class="table table-bordered" id="dyntable">
 						<colgroup>
 							<col class="con0" style="align: center; width: 4%" />
@@ -84,11 +84,10 @@
 								<th  class="head1 center">No</th>
 								<th  class="head0 center nosort"><input type="checkbox" class="checkall" /></th>
 								<th  class="head1 center">Penerima</th>
+								<th  class="head1 center">Pengirim</th>
 								<th class="head1 center">Tanggal Order</th>
 								<th class="head0 center">Daerah Pengiriman</th>
 								<th class="head1 center">Belanja</th>
-								<th class="head1 center">Diskon</th>
-								<th class="head0 center">Ongkir</th>
 								<th class="head0 center">Total</th>
 								<th class="head1 center">Status Bayar</th>
 								<th class="head1 center">Status Kirim</th>
@@ -102,7 +101,7 @@
 								?><tr class="gradeX"><td colspan="8"><font class="no-data-tabel">Data tidak ditemukan</font></td></tr><?php
 								} else {
 							
-								$i = 1;
+								$row = 1;
 								foreach($list_history_order as $order):?>
 							<tr class="gradeX">
 							
@@ -113,20 +112,30 @@
 									</span>
 								</td>
 								<td><?=$order->billing_name?></td>
+								<td><?=$order->shipper_name?></td>
 								<td class="center"><?php echo date("d-M-Y", strtotime($order->order_date))?></td>
 								<td class="center"><?=$order->billing_kec?>,&nbsp; <?=$order->billing_city?></td>
-								<td class="center">
+								
+								<td >
+									Belanja :
 									<?php if ($order->product_amount >= 1000000) { ?> 
-										<span style="color:blue; font-weight:bold;"><?=$order->product_amount?></span>
+										<span class="right nominal" style="color:blue; font-weight:bold;">
+											<?=$order->product_amount - $order->discount_amount?>
+										</span>
 									<?php } else if ($order->product_amount >= 500000) { ?>
-										<span style="color:blue;"><?=$order->product_amount?></span>
+										<span class="right nominal" style="color:blue;">
+											<?=$order->product_amount - $order->discount_amount?>
+										</span>
 									<?php } else { ?>
-										<span style="color:red;"><?=$order->product_amount?></span>
+										<span style="color:red;">
+											<?=$order->product_amount - $order->discount_amount?>
+										</span>
 									<?php } ?>
+									<br/>
+									Penyesuaian : <b class="right nominal"><?=$order->adjustment_nominal?></b><br/>
+									Ongkir : <b class="right nominal"><?=$order->exp_cost?></b><br/>
 								</td> 
-								<td class="center"><?=$order->discount_amount?></td>
-								<td class="center"><?=$order->exp_cost?></td>
-								<td class="center"><?=$order->total_amount?></td>
+								<td class="right nominal"><?=$order->total_amount?></td>
 								<td class="center"><?php 
 														if ($order->order_status == 2) {
 															echo '<font color="lime">Lunas</font>';
@@ -148,7 +157,6 @@
 						
 					</div>	
 					</table>
-					<p><?php echo $links; ?></p>
 					
 				</div>	
                 </table>

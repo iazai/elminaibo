@@ -70,9 +70,9 @@
 							<td class="center"><?=$row++;?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->sales_date))?></td>
                             <td><?=$item->sales_desc?></td>
-							<td class="center"><?=$item->sales_nominal?></td>
-							<td class="center"><?=$item->sales_cogs?></td>
-							<td class="center"><?php echo $item->sales_nominal - $item->sales_cogs?></td>
+							<td class="right nominal"><?=$item->sales_nominal?></td>
+							<td class="right nominal"><?=$item->sales_cogs?></td>
+							<td class="right nominal"><?php echo $item->sales_nominal - $item->sales_cogs?></td>
                             <td class="centeralign">
 								<a href="<?=base_url()?>index.php/sales/update/<?=$item->sales_id?>" title="Edit / Update"><span class="iconsweets-create"></span></a>&nbsp;
 								<?php echo anchor('sales/delete/'.$item->sales_id,'<span class="icon-trash"></span>', array('title' => 'Delete', 'onClick' => "return confirm('Are you sure about this?')"));?>

@@ -42,6 +42,8 @@
 									<label>Qty <font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-small validate[required]" style="width:30px;" name="stock_qty" id="stock_qty"/> 
+									&nbsp;COGS
+										<input type="text" class="input-small validate[required]" name="stock_cogs" id="stock_cogs"/> 
 									</span>
 								</p>
 								<p class="stdformbutton">

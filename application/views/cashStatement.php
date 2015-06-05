@@ -35,10 +35,8 @@
 								</span>
 								<span class="field">
 									<select name="year" id="year" style="width:200px;" class="validate[required]">
+										<option value="2015">2015</option>
 										<option value="2014">2014</option>
-										<option value="2013">2013</option>
-										
-									
 									</select>
 								</span>
 								<button class="btn btn-primary">SUBMIT</button>
@@ -190,18 +188,18 @@
 					} 
 					else {
 						
-						foreach ($equities as $item) { ?>
+						foreach ($equities as $equity) { ?>
 						<tr class="gradeX">
 							<td class="center"><?=$row++;?></td>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=$item->cash_desc?></td>
-							<td class="right nominal"><?=$item->cash_nominal?></td>
+							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?=$equity->cash_desc?></td>
+							<td class="right nominal"><?=$equity->cash_nominal?></td>
 							<td class="center"></td>
-							<td class="center"><?php if ($item->sales_nominal != 0) 
-														echo round(trim($item->cash_nominal / $item->sales_nominal * 100,'-'),2);
+							<td class="center"><?php if ($sales_nominal != 0) 
+														echo round(trim($equity->cash_nominal / $sales_nominal * 100,'-'),2);
 													else echo 0?> %</td>
                         </tr>
 					<?php 
-							$total_equities = $total_equities + $item->cash_nominal;
+							$total_equities = $total_equities + $equity->cash_nominal;
 						}} ?>
 					
 					

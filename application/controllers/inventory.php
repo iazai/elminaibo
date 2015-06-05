@@ -22,6 +22,13 @@ class Inventory extends CI_Controller {
 			$this->load->helper('form');
 			$this->load->library('form_validation');
 			
+			// query product
+			$this->db->where('status', 1);
+			$this->db->order_by('product_name');
+			$data['products'] = $this->db->get('tb_product')->result();
+			
+			// query inv type
+			$this->db->like('option_code', 'INV');
 			$this->db->order_by('option_desc');
 			$data['inventory_type'] = $this->db->get('tb_options')->result();
 			
@@ -56,8 +63,7 @@ class Inventory extends CI_Controller {
 			$searchparam = array(
 				   'inventory_type_id' => $this->input->post('inventory_type_id'),
 				   'inventory_desc' => $this->input->post('inventory_desc'),
-				   'bank_account_id' => $this->input->post('bank_account_id'),
-				   'debet_credit' => $this->input->post('debet_credit')
+				   'product_id' => $this->input->post('product_id')
 			);
 			
 			$this->GenericModel->searchterm_handler($searchparam);

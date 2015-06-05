@@ -115,6 +115,7 @@ class Order extends CI_Controller {
 				// CART
 				
 				// masukkan produk kedalam tb_cart
+				$this->db->join('tb_product', 'tb_product.product_id = tb_stock.product_id');
 				$queryAllStock = $this->db->get('tb_stock');
 				if ($queryAllStock->num_rows > 0) {
 					foreach ($queryAllStock->result() as $rowStock) {

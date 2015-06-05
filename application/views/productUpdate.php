@@ -31,12 +31,12 @@
 									</span>
 								</p>
 								
-								<p>
+								<!--p>
 									<label>COGS<font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="current_cogs" id="current_cogs" value="<?=$item->current_cogs?>"/> 
 									</span>
-								</p>
+								</p-->
 								
 								<p>
 									<label>Product Code<font style="color:red;"></font></label>
@@ -49,6 +49,18 @@
 									<label>Product Weight (gram)<font style="color:red;"></font></label>
 									<span class="field">
 										<input type="text" class="input-small" style="width:50px;" name="product_weight" id="product_weight" value="<?=$item->product_weight?>"/> 
+									</span>
+								</p>
+								<p>
+									<label>Price 1-9<font style="color:red;"></font></label>
+									<span class="field">
+										<input type="text" class="input-small" name="product_price_1" id="product_price_1" value="<?=$item->current_special_price?>"/> 
+									</span>
+								</p>
+								<p>
+									<label>Price >= 10<font style="color:red;"></font></label>
+									<span class="field">
+										<input type="text" class="input-small" name="product_price_2" id="product_price_2" value="<?=$item->current_wholesale_price?>"/> 
 									</span>
 								</p>
 								

@@ -133,7 +133,7 @@ class acrec extends CI_Controller {
 	public function add() {
 		if($this->session->userdata('logged_in')) {
 			
-			$this->db->where('option_type', 'ACT_REC');
+			$this->db->where('option_type', 'EXP');
 			$this->db->order_by('option_desc');
 			$data['acrec_type'] = $this->db->get('tb_options')->result();
 			
@@ -157,7 +157,7 @@ class acrec extends CI_Controller {
 			$this->db->order_by('bank_account_name');
 			$data['bank_account']=$this->db->get('bank_account')->result();
 			
-			$this->db->where('option_type', 'ACT_REC');
+			$this->db->where('option_type', 'EXP');
 			$this->db->order_by('option_desc');
 			$data['acrec_type'] = $this->db->get('tb_options')->result();
 			

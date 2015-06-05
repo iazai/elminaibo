@@ -14,13 +14,19 @@ class Stock_model extends CI_Model {
 		} else {
 			
 			if (!empty($searchparam['stock_desc'])) {
-				$this->db->like('stock_desc', $searchparam['stock_desc']);
+				$like = "(tb_product.product_name like '%".$searchparam['stock_desc']."%' || stock_desc like '%".$searchparam['stock_desc']."%')";
+				$this->db->where($like);
 			}
 			
 			if (!empty($searchparam['qty_minimum'])) {
 				$this->db->where('stock_qty >=', $searchparam['qty_minimum']);
 			}
 			
+			if (!empty($searchparam['stock_status'])) {
+				$this->db->where('stock_status', $searchparam['stock_status']);
+			}
+			
+			$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id');
 			$count=$this->db->count_all_results('tb_stock');
 			return $count;
 		}
@@ -42,6 +48,10 @@ class Stock_model extends CI_Model {
 		
 		if (!empty($searchparam['qty_minimum'])) {
 			$this->db->where('stock_qty >=', $searchparam['qty_minimum']);
+		}
+
+		if (!empty($searchparam['stock_status'])) {
+			$this->db->where('tb_stock.stock_status', $searchparam['stock_status']);
 		}
 			
 		$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id');
@@ -115,7 +125,7 @@ class Stock_model extends CI_Model {
 				$row->general_date = $row->year_date_date;
 				
 				// RESTOCK QTY
-				$this->db->select('inventory_id, inventory_date, tb_inventory.inventory_nominal / tb_product.current_cogs as restock_qty');
+				$this->db->select('inventory_id, inventory_date, tb_inventory.inventory_qty_init as restock_qty');
 				$this->db->from('tb_inventory');
 				$this->db->join('tb_stock', 'tb_stock.stock_id = tb_inventory.stock_id','left');
 				$this->db->join('tb_product', 'tb_stock.product_id = tb_product.product_id','left');

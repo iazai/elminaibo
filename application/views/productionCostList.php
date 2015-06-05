@@ -98,7 +98,7 @@
                             <td><?=$item->option_desc?></td>
                             <td><?=$item->production_cost_desc?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->production_cost_date))?></td>
-                            <td class="center"><?=$item->production_cost_nominal?></td>
+                            <td class="right nominal"><?=$item->production_cost_nominal?></td>
 							<td class="center"><?=$item->bank_account_name?></td>
                             <td class="centeralign">
 								<a href="<?=base_url()?>index.php/production_cost/update/<?=$item->production_cost_id?>" title="Edit / Update"><span class="iconsweets-create"></span></a>&nbsp;

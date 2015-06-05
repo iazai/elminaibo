@@ -5,7 +5,12 @@
 		<?php $session_data = $this->session->userdata('logged_in'); ?>
         <div class="leftmenu">        
             <ul class="nav nav-tabs nav-stacked">
-            	<li class="nav-header"><center><span style="font-size:18px; text-align:center; color:#FFF">ELMINA BACKOFFICE</span></center></li>
+            	<li class="nav-header"><center>
+				<span style="font-size:18px; text-align:center; color:#FFF">
+					<div class="logo">
+						<a href="<?=base_url()?>index.php/"><img src="<?=base_url()?>assets/images/logo.png" alt="" /></a>
+					</div>
+				</span></center></li>
        	    
 			<?php if ($session_data['user_role'] == 'admin' || $session_data['user_role'] == 'manager' || $session_data['user_role'] == 'operation') { ?>
 			<li class="nav-header">Operation</li>
@@ -13,13 +18,15 @@
 				<li><a href="<?=base_url()?>index.php/stock/lists"><span class="iconfa-laptop"></span>Product Stock</a></li>
 				<li><a href="<?=base_url()?>index.php/reject/lists"><span class="iconfa-laptop"></span>Reject</a></li>
 				<li><a href="<?=base_url()?>index.php/customer/lists"><span class="iconfa-laptop"></span>Customer List</a></li>
-				<li><a href="<?=base_url()?>index.php/deposit/lists"><span class="iconfa-laptop"></span>Deposit</a></li>
+				<li><a href="<?=base_url()?>index.php/agent/lists"><span class="iconfa-laptop"></span>Agent List</a></li>
+				<li><a href="<?=base_url()?>index.php/wallet/lists"><span class="iconfa-laptop"></span>Wallet Management</a></li>
 			<?php } ?>	
 			
 			<?php if ($session_data['user_role'] == 'admin' || $session_data['user_role'] == 'manager') { ?>
 			<li class="nav-header">Stats & Logs</li>
-				<li><a href="<?=base_url()?>index.php/cart_stats/main"><span class="iconfa-laptop"></span>Cart Statistic</a></li>
-				<li><a href="<?=base_url()?>index.php/customer_stats/main"><span class="iconfa-laptop"></span>Customer Statistic</a></li>
+				
+				<li><a href="<?=base_url()?>index.php/cart_stats/sold_restock"><span class="iconfa-laptop"></span>Inventory Statistic</a></li>
+				<li><a href="<?=base_url()?>index.php/customer_stats/customer_rank"><span class="iconfa-laptop"></span>Customer Statistic</a></li>
 				<li><a href="<?=base_url()?>index.php/activity/lists"><span class="iconfa-laptop"></span>Activity Log</a></li>
 			<?php } ?>	
 			
@@ -48,6 +55,9 @@
 				<li><a><h3><strong>COST</strong></h3></a></li>
 				<li><a href="<?=base_url()?>index.php/expense/lists"><span class="iconfa-laptop"></span>Expenses</a></li>
 				<li><a href="<?=base_url()?>index.php/depreciation/lists"><span class="iconfa-laptop"></span>Depreciation</a></li>
+				<li><a><h3><strong>Payroll</strong></h3></a></li>
+				<li><a href="<?=base_url()?>index.php/salary/lists"><span class="iconfa-laptop"></span>Salary</a></li>
+				<li><a href="<?=base_url()?>index.php/employee/lists"><span class="iconfa-laptop"></span>Employee</a></li>
 			<?php } ?>	
 			
 			<?php if (!empty($session_data['user_role'])) {?>

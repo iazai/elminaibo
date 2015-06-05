@@ -38,7 +38,7 @@ class Cash_statement extends CI_Controller {
 		if($this->session->userdata('logged_in')) {	
 			$this->load->helper('form');
 			$this->load->library('form_validation');
-			
+									
 			// get month list
 			$where = "option_type = 'MON'";
 			$this->db->where($where);
@@ -47,7 +47,7 @@ class Cash_statement extends CI_Controller {
 			
 			$period 	= $this->input->post('period');
 			$year 	= $this->input->post('year');
-			
+
 			$month_name = null;
 			// all ids, merge into array, as a condition to summarize nominal in EACH ENTITY
 			if (!empty($period)) {
@@ -56,13 +56,13 @@ class Cash_statement extends CI_Controller {
 				$row = $this->db->get('tb_options')->row();
 				$month_name = $row->option_desc;
 			
-				$sales_nominal = $this->get_sales_nominal($period);
-				$prod_costs = $this->get_prod_cost_list($period);
-				$money_borrowed = $this->get_money_borrowed_nominal($period);
-				$money_repaid = $this->get_money_repaid_nominal($period);
-				$ppe_investment = $this->get_ppe_list($period);
-				$original_investment = $this->get_original_investment_list($period);
-				$expenses = $this->get_expenses_list($period);
+				$sales_nominal = $this->get_sales_nominal($period, $year);
+				$prod_costs = $this->get_prod_cost_list($period, $year);
+				$money_borrowed = $this->get_money_borrowed_nominal($period, $year);
+				$money_repaid = $this->get_money_repaid_nominal($period, $year);
+				$ppe_investment = $this->get_ppe_list($period, $year);
+				$original_investment = $this->get_original_investment_list($period, $year);
+				$expenses = $this->get_expenses_list($period, $year);
 				
 				$begining_cash = $this->get_begining_cash_nominal($period, $year);
 				
@@ -103,9 +103,10 @@ class Cash_statement extends CI_Controller {
 		}
 	}
 	
-	private function get_sales_nominal($period) {
+	private function get_sales_nominal($period, $year) {
 		// range date
 		
+		$this->db->where('YEAR(cash_date)',$year);
 		$this->db->where('MONTH(cash_date)',$period);
 		$this->db->where('order_id is not null');
 		$query = $this->db->get('tb_cash');
@@ -133,11 +134,13 @@ class Cash_statement extends CI_Controller {
 		return $sum_nominal;			
 	}
 	
-	private function get_prod_cost_list($period) {
+	private function get_prod_cost_list($period, $year) {
+		// range date
 		
 		$this->db->select('cash_type_id, tb_options.option_desc, sum(cash_nominal) as cash_nominal');
 		$this->db->from('tb_cash');
 		
+		$this->db->where('YEAR(cash_date)',$year);
 		$this->db->where('MONTH(cash_date)',$period);
 		$this->db->where('tb_options.option_root_id',78); // 'PROD'
 		
@@ -157,41 +160,45 @@ class Cash_statement extends CI_Controller {
 		return false;			
 	}
 	
-	private function get_money_borrowed_nominal($period) {
+	private function get_money_borrowed_nominal($period, $year) {
 		// range date
 		
-		$this->db->where('MONTH(acrec_date)',$period);
+		$this->db->where('YEAR(cash_date)',$year);
+		$this->db->where('MONTH(cash_date)',$period);
+		$this->db->where('acrec_id is not null');
 		
-		$query = $this->db->get('tb_acrec');
+		$query = $this->db->get('tb_cash');
 		
 		$sum_nominal = '';
 		if ($query->num_rows > 0) {
 			foreach ($query->result() AS $item) {
-				$sum_nominal = $sum_nominal - $item->acrec_nominal;
+				$sum_nominal = $sum_nominal - $item->cash_nominal;
 			}
 		}
 		return $sum_nominal;			
 	}
 	
-	private function get_money_repaid_nominal($period) {
+	private function get_money_repaid_nominal($period, $year) {
 		// range date
 		
-		$this->db->where('MONTH(liabilities_date)',$period);
-		$this->db->where('liabilities_type_id',84); // Money Repaid
-		$query = $this->db->get('tb_liabilities');
+		$this->db->where('YEAR(cash_date)',$year);
+		$this->db->where('MONTH(cash_date)',$period);
+		$this->db->where('liabilities_id is not null'); // Money Repaid
+		$query = $this->db->get('tb_cash');
 		
 		$sum_nominal = '';
 		if ($query->num_rows > 0) {
 			foreach ($query->result() AS $item) {
-				$sum_nominal = $sum_nominal + $item->liabilities_nominal;
+				$sum_nominal = $sum_nominal + $item->cash_nominal;
 			}
 		}
 		return $sum_nominal;			
 	}
 	
-	private function get_ppe_list($period) {
+	private function get_ppe_list($period, $year) {
 		// range date
 		
+		$this->db->where('YEAR(cash_date)',$year);
 		$this->db->where('MONTH(cash_date)',$period);
 		$this->db->join('tb_ppe', 'tb_cash.ppe_id = tb_ppe.ppe_id','left');
 		$this->db->join('tb_options', 'tb_ppe.ppe_type_id = tb_options.option_id','left');
@@ -207,9 +214,10 @@ class Cash_statement extends CI_Controller {
 		return false;
 	}
 	
-	private function get_original_investment_list($period) {
+	private function get_original_investment_list($period, $year) {
 		// range date
 		
+		$this->db->where('YEAR(cash_date)',$year);
 		$this->db->where('MONTH(cash_date)',$period);
 		$this->db->join('tb_options', 'tb_cash.cash_type_id = tb_options.option_id','left');
 		$this->db->where_in('option_type','EQUITY'); // INV_SOLD
@@ -224,10 +232,11 @@ class Cash_statement extends CI_Controller {
 		return false;
 	}
 	
-	private function get_expenses_list($period) {
+	private function get_expenses_list($period, $year) {
 		// range date
 		
 		$this->db->select('cash_type_id, option_desc, sum(cash_nominal) as cash_nominal');
+		$this->db->where('YEAR(cash_date)',$year);
 		$this->db->where('MONTH(cash_date)',$period);
 		$this->db->join('tb_options', 'tb_cash.cash_type_id = tb_options.option_id','left');		
 		$this->db->where_in('option_type','EXP');

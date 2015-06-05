@@ -25,7 +25,7 @@
 								<h4 class="widgettitle">&nbsp; Account Receivable </h4>
 								<div class="widgetcontent">
 								<p>
-									<label>Account Receivable Type<font style="color:red;">*</font></label>
+									<label>AR Type<font style="color:red;">*</font></label>
 									<span class="field">
 										<select name="acrec_type_id" id="acrec_type_id" style="width:200px;" class="validate[required]">
 											<option>- Choose Type -</option>

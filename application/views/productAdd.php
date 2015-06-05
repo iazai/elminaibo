@@ -27,12 +27,12 @@
 										<input type="text" class="input-xlarge validate[required]" name="product_name" id="product_name" /> 
 									</span>
 								</p>
-								<p>
+								<!--p>
 									<label>Product COGS <font style="color:red;">*</font></label>
 									<span class="field">
 										<input type="text" class="input-xlarge validate[required]" name="current_cogs" id="current_cogs" /> 
 									</span>
-								</p>
+								</p-->
 								
 								<p>
 									<label>Product Code<font style="color:red;"></font></label>
@@ -47,7 +47,18 @@
 										<input type="text" class="input-small" style="width:50px;" name="product_weight" id="product_weight" /> 
 									</span>
 								</p>
-								
+								<p>
+									<label>Price 1-9<font style="color:red;"></font></label>
+									<span class="field">
+										<input type="text" class="input-small" name="product_price_1" id="product_price_1" /> 
+									</span>
+								</p>
+								<p>
+									<label>Price >=10<font style="color:red;"></font></label>
+									<span class="field">
+										<input type="text" class="input-small" name="product_price_2" id="product_price_2" /> 
+									</span>
+								</p>
 								<p>
 									<label>Status <font style="color:red;">*</font></label>
 									<span class="field">

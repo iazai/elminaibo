@@ -22,11 +22,22 @@
 								<h4 class="widgettitle">&nbsp; Money Repaid </h4>
 								<div class="widgetcontent">
 								<p>
-									<label>Liabilities Type<font style="color:red;">*</font></label>
+									<label>Liability Type<font style="color:red;">*</font></label>
 									<span class="field">
 										<select name="liabilities_type_id" id="liabilities_type_id" style="width:200px;" class="validate[required]">
-											
-										<?php foreach($liabilities_type as $type): ?>
+											<option value>- Liability Type - </option>
+										<?php foreach($liability_type as $type): ?>
+											<option value="<?php echo $type->option_id?>"><?php echo $type->option_desc?></option>
+										<?php endforeach; ?>
+										</select>
+									</span>
+								</p>
+								<p>
+									<label>Paid For<font style="color:red;">*</font></label>
+									<span class="field">
+										<select name="repaid_type_id" id="repaid_type_id" style="width:200px;" class="validate[required]">
+											<option value>- Expense - </option>
+										<?php foreach($expense_type as $type): ?>
 											<option value="<?php echo $type->option_id?>"><?php echo $type->option_desc?></option>
 										<?php endforeach; ?>
 										</select>
@@ -35,20 +46,35 @@
 								<p>
 									<label>Date  <font style="color:red;">*</font></label>
 									<span class="field">
-										<input type="text" name="liabilities_date" id ="liabilities_date" class="validate[required]"/>
+										<input type="text" name="repaid_date" id ="repaid_date" class="validate[required]"/>
 									</span>
 								</p>
 								<p>
 									<label>Description <font style="color:red;">*</font></label>
 									<span class="field">
-										<input type="text" class="input-xlarge validate[required]" name="liabilities_desc" id="liabilities_desc" /> 
+										<input type="text" class="input-xlarge validate[required]" name="repaid_desc" id="repaid_desc" /> 
 									</span>
 								</p>
+								
+								<p>
+									<label>Asset Type <font style="color:red;">*</font></label>
+									<span class="field">
+										<select name="asset_code" id="asset_code" style="width:200px;" class="validate[required]" onchange="chooseAsset()">
+											<option value>- Asset Type -</option>
+										<?php foreach($asset_type as $asset): ?>
+											<option value="<?php echo $asset->option_code?>"><?php echo $asset->option_desc?></option>
+										<?php endforeach; ?>
+										</select>
+									</span>
+								</p>
+										
+								
 								<p>
 									<label>Nominal<font style="color:red;">*</font></label>
 									<span class="field">
-										<input type="text" class="input-medium" name="liabilities_nominal" id="liabilities_nominal" class="validate[required]"/>
-										<select name="bank_account_id" id="bank_account_id" style="width:200px;" class="validate[required]">
+										<input type="text" class="input-medium" name="repaid_nominal" id="repaid_nominal" class="validate[required]"/>
+										
+										<select name="bank_account_id" id="bank_account_id" style="width:200px; display:none;" class="validate[required]">
 											<option value>- Bank Account -</option>
 										<?php foreach($bank_account as $bank): ?>
 											<option value="<?php echo $bank->id?>"><?php echo $bank->bank_account_name?></option>
@@ -72,6 +98,15 @@
     });
 	
 	$(function() {
-		$( "#liabilities_date" ).datepicker({dateFormat: "dd-M-yy"});
+		$( "#repaid_date" ).datepicker({dateFormat: "dd-M-yy"});
 	}); 
+	
+	
+	function chooseAsset() {
+        if (document.getElementById('asset_code').value == 'CASH') {
+            document.getElementById('bank_account_id').style.display="block";
+        } else {
+            document.getElementById('bank_account_id').style.display="none";
+        }
+    }
 </script>

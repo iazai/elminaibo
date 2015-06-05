@@ -30,7 +30,7 @@ class Customer_model extends CI_Model {
 
     public function fetch_customer($limit, $start, $searchparam) {
         
-		$this->db->select('*');
+		$this->db->select('billing.*, tb_options.*, dropshipper.billing_name as ds_name');
 		$this->db->from('billing');
 		
 		if (!empty($searchparam['billing_level'])) {
@@ -38,16 +38,16 @@ class Customer_model extends CI_Model {
 		}
 		
 		if (!empty($searchparam['billing_name'])) {
-				$this->db->like('billing_name', $searchparam['billing_name']);
+				$this->db->like('billing.billing_name', $searchparam['billing_name']);
 		}
 		
 		if (!empty($searchparam['billing_phone'])) {
-				$this->db->like('billing_phone', $searchparam['billing_phone']);
+				$this->db->like('billing.billing_phone', $searchparam['billing_phone']);
 		}
 		
-		$this->db->join('shipper', 'billing.dropshipper_id = shipper.shipper_id','left');
+		$this->db->join('billing as dropshipper', 'billing.dropshipper_id = dropshipper.billing_id','left');
 		$this->db->join('tb_options', 'billing.billing_level = tb_options.option_id', 'left');
-		$this->db->order_by('billing_name');
+		$this->db->order_by('billing.billing_name');
 		$this->db->limit($limit, $start);
 		$query=$this->db->get();
 		

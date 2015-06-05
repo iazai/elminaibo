@@ -88,8 +88,8 @@
                             <td><?=$item->option_desc?></td>
                             <td><?=$item->ppe_desc?></td>
 							<td class="center"><?php echo date("d-M-Y", strtotime($item->ppe_date))?></td>
-                            <td class="center"><?=$item->ppe_nominal?></td>
-							<td class="center"><?php echo $item->ppe_nominal - $item->ppe_has_been_paid?></td>
+                            <td class="right nominal"><?=$item->ppe_nominal?></td>
+							<td class="right nominal"><?php echo $item->ppe_nominal - $item->ppe_has_been_paid?></td>
                             <td class="centeralign">
 								<a href="<?=base_url()?>index.php/ppe/update/<?=$item->ppe_id?>" title="Edit / Update"><span class="iconsweets-create"></span></a>&nbsp;
 								<?php echo anchor('ppe/delete/'.$item->ppe_id,'<span class="icon-trash"></span>', array('title' => 'Delete', 'onClick' => "return confirm('Are you sure about this?')"));?>

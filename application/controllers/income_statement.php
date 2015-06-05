@@ -23,7 +23,8 @@ class Income_statement extends CI_Controller {
 			
 			// Searching
 			$searchparam = array(
-				   'period' => $this->input->post('period')
+				   'period' => $this->input->post('period'),
+				   'year' => $this->input->post('year')
 			);
 			
 			$this->GenericModel->searchterm_handler($searchparam);
@@ -39,31 +40,31 @@ class Income_statement extends CI_Controller {
 			$this->load->helper('form');
 			$this->load->library('form_validation');
 			
-			// get month list
-			$where = "option_type = 'MON'";
-			$this->db->where($where);
-			$this->db->order_by('option_type');
-			$data['months'] = $this->db->get('tb_options')->result();
 			
-			$period 	= $this->input->post('period');
+			$startdate 	= date('Y-m-d', strtotime($this->input->post('startdate')));
+			$enddate 	= date('Y-m-d', strtotime($this->input->post('enddate')));
+			
 			$month_name = null;
 			// all ids, merge into array, as a condition to summarize nominal in EACH ENTITY
-			if (!empty($period)) {
+			if (!empty($startdate) && !empty($enddate)) {
 			
-				$this->db->where('option_code', $period);
-				$row = $this->db->get('tb_options')->row();
-				$month_name = $row->option_desc;
+				//$this->db->where('option_code', $period);
+				//$row = $this->db->get('tb_options')->row();
+				$month_name = '';//$row->option_desc;
 			
-				$sales_nominal = $this->get_sales_nominal($period);
-				$cogs_nominal = $this->get_cogs_nominal($period);
-				$ongkir_nominal = $this->get_ongkir_nominal($period);
-				$expenses = $this->get_expenses_list($period);
-				$sedekah_nominal = $this->get_sedekah_nominal($period);
+				$sales_nominal = $this->get_sales_nominal($startdate, $enddate);
+				$cogs_nominal = $this->get_cogs_nominal($startdate, $enddate);
+				$ongkir_nominal = $this->get_ongkir_nominal($startdate, $enddate);
+				$ongkir_paid_nominal = $this->get_ongkir_paid_nominal($startdate, $enddate);
+				
+				$expenses = $this->get_expenses_list($startdate, $enddate);
+				$sedekah_nominal = $this->get_sedekah_nominal($startdate, $enddate);
 				
 			} else {
 				$sales_nominal = 0;
 				$cogs_nominal = 0;
 				$ongkir_nominal = 0;
+				$ongkir_paid_nominal = 0;
 				$expenses = null;
 				$sedekah_nominal = 0;
 			}			
@@ -73,11 +74,11 @@ class Income_statement extends CI_Controller {
 				'sales_nominal' => $sales_nominal,
 				'cogs_nominal' => $cogs_nominal,
 				'ongkir_nominal' => $ongkir_nominal,
+				'ongkir_paid_nominal' => $ongkir_paid_nominal,
 				'gp_nominal' => ($sales_nominal + $cogs_nominal),
 				'sedekah_nominal' => $sedekah_nominal,
-				'month_id' => $period,
-				'month' => $month_name,
-				
+				'startdate' => $startdate,
+				'enddate' => $enddate
 				
 			);
 					
@@ -94,11 +95,15 @@ class Income_statement extends CI_Controller {
 		}
 	}
 	
-	private function get_sales_nominal($period) {
+	private function get_sales_nominal($startdate, $enddate) {
 		// range date
 		
-		$this->db->where('MONTH(order_date)',$period);
+		$this->db->where('order_date >=',$startdate);
+		$this->db->where('order_date <=',$enddate);
+		
 		$query = $this->db->get('orders');
+		
+		
 		$sum_nominal = '';
 		if ($query->num_rows > 0) {
 			foreach ($query->result() AS $item) {
@@ -108,10 +113,11 @@ class Income_statement extends CI_Controller {
 		return $sum_nominal;			
 	}
 	
-	private function get_ongkir_nominal($period) {
+	private function get_ongkir_nominal($startdate, $enddate) {
 		// range date
 		
-		$this->db->where('MONTH(order_date)',$period);
+		$this->db->where('order_date >=',$startdate);
+		$this->db->where('order_date <=',$enddate);
 		
 		$query = $this->db->get('orders');
 		$sum_nominal = '';
@@ -123,10 +129,28 @@ class Income_statement extends CI_Controller {
 		return $sum_nominal;			
 	}
 	
-	private function get_cogs_nominal($period) {
+	private function get_ongkir_paid_nominal($startdate, $enddate) {
 		// range date
 		
-		$this->db->where('MONTH(inventory_date)',$period);
+		$this->db->where('expense_date >=',$startdate);
+		$this->db->where('expense_date <=',$enddate);
+		$this->db->where('expense_type_id',33); // ongkir
+		
+		$query = $this->db->get('tb_expense');
+		$sum_nominal = '';
+		if ($query->num_rows > 0) {
+			foreach ($query->result() AS $item) {
+				$sum_nominal = $sum_nominal + $item->expense_nominal;
+			}
+		}
+		return $sum_nominal;			
+	}
+	
+	private function get_cogs_nominal($startdate, $enddate) {
+		// range date
+		
+		$this->db->where('inventory_date >=',$startdate);
+		$this->db->where('inventory_date <=',$enddate);
 		
 		$this->db->where_in('inventory_type_id',24); // INV_SOLD
 		$query = $this->db->get('tb_inventory');
@@ -140,14 +164,16 @@ class Income_statement extends CI_Controller {
 		return $sum_nominal;			
 	}
 	
-	private function get_expenses_list($period) {
+	private function get_expenses_list($startdate, $enddate) {
 		// range date
 		
 		$this->db->select('expense_type_id, option_desc, sum(expense_nominal) as exp_nominal');
 		$this->db->from('tb_expense');
 		
-		$this->db->where('MONTH(expense_date)',$period);
+		$this->db->where('expense_date >=',$startdate);
+		$this->db->where('expense_date <=',$enddate);
 		$this->db->where('expense_type_id <>',43); // sedekah
+		$this->db->where('expense_type_id <>',33); // ongkir
 		$this->db->join('tb_options', 'tb_expense.expense_type_id = tb_options.option_id','left');
 		$this->db->group_by('expense_type_id');
 		
@@ -162,10 +188,12 @@ class Income_statement extends CI_Controller {
 		return false;
 	}
 	
-	private function get_sedekah_nominal($period) {
+	private function get_sedekah_nominal($startdate, $enddate) {
 		// range date
 		
-		$this->db->where('MONTH(expense_date)',$period);
+		$this->db->where('expense_date >=',$startdate);
+		$this->db->where('expense_date <=',$enddate);
+		
 		$this->db->where_in('expense_type_id',43); // sedekah
 		$query = $this->db->get('tb_expense');
 		
@@ -197,10 +225,13 @@ class Income_statement extends CI_Controller {
 	public function expenses_detail_per_type_list() {
 		if($this->session->userdata('logged_in')) {
 			
-			$period = $this->uri->segment(3);
-			$expense_type_id = $this->uri->segment(4);
+			$startdate = $this->uri->segment(3);
+			$enddate = $this->uri->segment(4);
+			$expense_type_id = $this->uri->segment(5);
 			
-			$this->db->where('MONTH(expense_date)',$period);
+			$this->db->where('expense_date >=',$startdate);
+			$this->db->where('expense_date <=',$enddate);
+			
 			$this->db->where('expense_type_id',$expense_type_id);
 			$this->db->join('tb_options', 'tb_expense.expense_type_id = tb_options.option_id','left');
 			$this->db->join('bank_account', 'bank_account.id = tb_expense.bank_account_id','left');

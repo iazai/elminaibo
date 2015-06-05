@@ -39,10 +39,10 @@ class OrderModel extends CI_Model
 	
 	
 		// ================= fetching order complete
-		$ordercomplete = $this->db->select('*');
+		$ordercomplete = $this->db->select('*,  billing.billing_id as bill_id, billing.billing_name as bill_name');
 		$ordercomplete = $this->db->from('orders');
 		$ordercomplete = $this->db->join('billing', 'orders.billing_id = billing.billing_id');
-		$ordercomplete = $this->db->join('shipper', 'orders.shipper_id = shipper.shipper_id');
+		//$ordercomplete = $this->db->join('billing as ship', 'orders.shipper_id = ship.billing_id', 'left');
 		$ordercomplete = $this->db->where('orders.order_status', 2);
 		$ordercomplete = $this->db->where('orders.package_status', 1);
 		
@@ -56,6 +56,10 @@ class OrderModel extends CI_Model
 		
 		if (!empty($searchparam['billing_kec'])) {
 			$ordercomplete = $this->db->like('billing.billing_kec', $searchparam['billing_kec']);
+		}
+		
+		if (!empty($searchparam['billing_city'])) {
+			$ordercomplete = $this->db->like('billing.billing_city', $searchparam['billing_city']);
 		}
 		
 		$ordercomplete = $this->db->order_by("orders.order_date", "desc"); 
@@ -76,11 +80,12 @@ class OrderModel extends CI_Model
 		// ================= fetching order pending
 		$wherepending = '(orders.order_status < 2 OR orders.package_status=0)';
 		
-		$orderpending = $this->db->select('*');
-		$orderpending = $this->db->from('orders');
-		$orderpending = $this->db->join('billing', 'orders.billing_id = billing.billing_id');
-		$orderpending = $this->db->join('shipper', 'orders.shipper_id = shipper.shipper_id');
-		$orderpending = $this->db->join('tb_options', 'orders.order_channel = tb_options.option_id', 'left');
+		$this->db->select('*, billing.billing_id as bill_id, billing.billing_name as bill_name,
+						billing.billing_kec as bill_kec,
+						billing.billing_city as bill_city');
+		$this->db->from('orders');
+		$this->db->join('billing', 'orders.billing_id = billing.billing_id');
+		$this->db->join('tb_options', 'orders.order_channel = tb_options.option_id', 'left');
 		
 		$orderpending = $this->db->where($wherepending);
 		if (!empty($searchparam['billing_name'])) {
@@ -93,6 +98,10 @@ class OrderModel extends CI_Model
 		
 		if (!empty($searchparam['billing_kec'])) {
 			$orderpending = $this->db->like('billing.billing_kec', $searchparam['billing_kec']);
+		}
+		
+		if (!empty($searchparam['billing_city'])) {
+			$orderpending = $this->db->like('billing.billing_city', $searchparam['billing_city']);
 		}
 		
 		$orderpending = $this->db->order_by("orders.order_date", "desc");
@@ -117,10 +126,18 @@ class OrderModel extends CI_Model
 		$allorder = $this->db->select('*');
 		$allorder = $this->db->from('orders');
 		$allorder = $this->db->join('billing', 'orders.billing_id = billing.billing_id');
-		$allorder = $this->db->join('shipper', 'orders.shipper_id = shipper.shipper_id');
+		$allorder = $this->db->join('shipper', 'orders.shipper_id = shipper.shipper_id','left');
 		
 		if (!empty($searchparam['billing_name'])) {
 			$allorder = $this->db->like('billing.billing_name', $searchparam['billing_name']);
+		}
+		
+		if (!empty($searchparam['billing_phone'])) {
+			$allorder = $this->db->like('billing.billing_name', $searchparam['billing_phone']);
+		}
+		
+		if (!empty($searchparam['billing_id'])) {
+			$allorder = $this->db->where('orders.billing_id', $searchparam['billing_id']);
 		}
 		
 		$allorder = $this->db->order_by("orders.order_date", "desc");

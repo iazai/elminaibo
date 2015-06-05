@@ -67,13 +67,13 @@ class Roseta_stone extends CI_Controller {
 					if (!empty($startdate) && !empty($enddate)) {
 					
 						$sum_cash = $this->get_cash_nominal($ids, $startdate, $enddate);
-						/*$sum_bca = $this->get_bca_nominal($ids, $startdate, $enddate);
+						$sum_bca = $this->get_bca_nominal($ids, $startdate, $enddate);
 						$sum_mandiri = $this->get_mandiri_nominal($ids, $startdate, $enddate);
 						$sum_bri = $this->get_bri_nominal($ids, $startdate, $enddate);
 						$sum_bni = $this->get_bni_nominal($ids, $startdate, $enddate);
 						$sum_rusydi = $this->get_rusydi_nominal($ids, $startdate, $enddate);
 						$sum_diaz = $this->get_diaz_nominal($ids, $startdate, $enddate);
-						*/
+						
 						$sum_acc_rec = $this->get_acc_rec_nominal($ids, $startdate, $enddate);
 						$sum_inventory = $this->get_inventory_nominal($ids, $startdate, $enddate);
 						$sum_ppe = $this->get_ppe_nominal($ids, $startdate, $enddate);
@@ -81,10 +81,10 @@ class Roseta_stone extends CI_Controller {
 						$sum_account_pay = $this->get_account_pay_nominal($ids, $startdate, $enddate);
 						$sum_notes_pay = $this->get_notes_pay_nominal($ids, $startdate, $enddate);
 						$sum_tax_pay = $this->get_tax_pay_nominal($ids, $startdate, $enddate);
-						/*
+						
 						$sum_rusydi_pay = $this->get_rusydi_pay_nominal($ids, $startdate, $enddate);
 						$sum_diaz_pay = $this->get_diaz_pay_nominal($ids, $startdate, $enddate);
-						*/
+						
 						$sum_equity = $this->get_equity_nominal($ids, $startdate, $enddate);
 						$sum_income = $this->get_income_nominal($ids, $startdate, $enddate);
 					} else {
@@ -107,23 +107,23 @@ class Roseta_stone extends CI_Controller {
 					$option_desc = $row->option_desc;
 					
 					$cash_subtotal = $sum_cash;
-					/*$bca_subtotal = $sum_bca;
+					$bca_subtotal = $sum_bca;
 					$mandiri_subtotal = $sum_mandiri;
 					$bri_subtotal = $sum_bri;
 					$bni_subtotal = $sum_bni;
 					$rusydi_subtotal = $sum_rusydi;
 					$diaz_subtotal = $sum_diaz;
-					*/
+					
 					$acc_rec_subtotal = $sum_acc_rec;
 					$inventory_subtotal = $sum_inventory;
 					$ppe_subtotal = $sum_ppe;
 					$account_pay_subtotal = $sum_account_pay;
 					$notes_pay_subtotal = $sum_notes_pay;
 					$tax_pay_subtotal = $sum_tax_pay;
-					/*
+					
 					$rusydi_pay_subtotal = $sum_rusydi_pay;
 					$diaz_pay_subtotal = $sum_diaz_pay;
-					*/
+					
 					$equity_subtotal = $sum_equity;
 					$income_subtotal = $sum_income;
 					
@@ -139,13 +139,12 @@ class Roseta_stone extends CI_Controller {
 							'option_desc' => $option_desc,
 							'cash' => $cash_subtotal,
 							
-							/*'bca' => $bca_subtotal,
+							'bca' => $bca_subtotal,
 							'mandiri' => $mandiri_subtotal,
 							'bri' => $bri_subtotal,
 							'bni' => $bni_subtotal,
 							'rusydi' => $rusydi_subtotal,
 							'diaz' => $diaz_subtotal,
-							*/
 							
 							'acc_rec' => $acc_rec_subtotal,
 							'inventory' => $inventory_subtotal,
@@ -154,9 +153,9 @@ class Roseta_stone extends CI_Controller {
 							'notes_pay' => $notes_pay_subtotal,
 							'tax_pay' => $tax_pay_subtotal,
 							
-							/*'rusydi_pay' => $rusydi_pay_subtotal,
+							'rusydi_pay' => $rusydi_pay_subtotal,
 							'diaz_pay' => $diaz_pay_subtotal,
-							*/
+							
 							'equity' => $equity_subtotal,
 							'income' => $income_subtotal,
 							);

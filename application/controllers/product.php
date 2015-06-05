@@ -26,6 +26,8 @@ class Product extends CI_Controller {
 				   'current_cogs' => $this->input->post('current_cogs'),
 				   'product_code' => $this->input->post('product_code'),
 				   'product_weight' => $this->input->post('product_weight'),
+				   'current_special_price' => $this->input->post('product_price_1'),
+				   'current_wholesale_price' => $this->input->post('product_price_2'),
 				   'status' => $this->input->post('status')
 				);
 			$this->db->insert('tb_product', $product); 
@@ -48,6 +50,8 @@ class Product extends CI_Controller {
 				   'current_cogs' => $this->input->post('current_cogs'),
 				   'product_code' => $this->input->post('product_code'),
 				   'product_weight' => $this->input->post('product_weight'),
+				   'current_special_price' => $this->input->post('product_price_1'),
+				   'current_wholesale_price' => $this->input->post('product_price_2'),
 				   'status' => $this->input->post('status')
 				);
 				

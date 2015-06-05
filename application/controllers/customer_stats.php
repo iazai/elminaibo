@@ -11,11 +11,55 @@ class Customer_stats extends CI_Controller {
         $this->load->library('pagination');
 		
 		$this->load->model('activity_model');
+		$this->load->model('customer_stats_model');
 		$this->load->model('GenericModel');
     }
 	
 	public function index() {
 	
+	}
+	
+	public function customer_rank() {
+		if($this->session->userdata('logged_in')) {	
+			$this->load->helper('form');
+			$this->load->library('form_validation');
+			
+			// get 
+			$this->db->where('billing_flag1',102);
+			$this->db->order_by('billing_name');
+			$data['billings'] = $this->db->get('billing')->result();
+			
+			// SEARCHING TERMS
+			$searchterm = $this->session->userdata('searchterm');
+			
+			$data['startdate'] = '';
+			$data['enddate'] = '';
+			if ($searchterm != null) {
+				if (!empty($searchterm['startdate']) && $searchterm['startdate'] != '1970-01-01') {
+					$data['startdate'] = $searchterm['startdate'];
+				}
+				if (!empty($searchterm['enddate']) && $searchterm['enddate'] != '1970-01-01') {
+					$data['enddate'] = $searchterm['enddate'];
+				}
+			}
+			// Paging
+			$config = array();
+			$config["base_url"] = base_url("index.php/customer_stats/customer_rank");
+			$config["total_rows"] = $this->customer_stats_model->record_count($searchterm);
+			$config["per_page"] = 20;
+			
+			$this->pagination->initialize($config);
+			$page = $this->uri->segment(3);
+			
+			$data["list_customer_rank"] = $this->customer_stats_model->fetch_customer_rank($config["per_page"], $page, $searchterm);
+			$data["links"] = $this->pagination->create_links();
+			$data["row"] = 1+$page;
+			$data["page"] = "customerRankStats";
+			
+			$this->load->view('dashboard',$data);
+		} else {
+			redirect(site_url('login'));
+		}
 	}
 	
 	public function clean_customer() {
@@ -87,17 +131,23 @@ class Customer_stats extends CI_Controller {
 	public function search() {
 		if($this->session->userdata('logged_in')) {	
 			$this->session->unset_userdata('searchterm');
+			$this->session->unset_userdata('orderterm');
+			
+			$startdate 	= date('Y-m-d', strtotime($this->input->post('startdate')));
+			$enddate 	= date('Y-m-d', strtotime($this->input->post('enddate')));
 			
 			// Searching
 			$searchparam = array(
-				   'startdate' => $this->input->post('startdate'),
-				   'enddate' => $this->input->post('enddate'),
-				   'top' => $this->input->post('top'),
+				   'billing_id' => $this->input->post('billing_id'),
+				   'startdate' => $startdate,	
+				   'enddate' => $enddate,	
+				   'order_column' => $this->input->post('order_column'),
+				   'order_type' => $this->input->post('order_type')
 			);
 			
 			$this->GenericModel->searchterm_handler($searchparam);
 			
-			redirect(site_url('customer_stats/main'));
+			redirect(site_url('customer_stats/customer_rank'));
 		} else {
 			 redirect(site_url('login'));
 		}

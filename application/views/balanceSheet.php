@@ -79,16 +79,49 @@
 													}} ?>
 												
 													<tr class="gradeX">
-														<td colspan="3">Total Account Payable</td>
+														<td colspan="3">Total Account Receivable</td>
 														<td class="right nominal"><b><?=$total_account_receivable?></b></td>
 													</tr>
 												</table>
 											</p>
-											<p>
-												<label>Inventory </label>
-												<span class="field">
-													100.000
-												</span>
+											<p>												
+												<table width="100%" class="table " id="income_table">
+													<tr>
+														<td colspan="4">Inventory  </td> 
+													</tr>
+													<?php
+													$row = 1;
+													$total_inventory = 0;?>
+													<tr class="gradeX">
+														<td class="center" width="2%"><?=$row++;?></td>
+														<td>
+															Inventory Barang Mentah
+														</td>
+														<td class="right nominal"><?=$inventory_barang_mentah?></td>
+													</tr>
+													<tr class="gradeX">
+														<td class="center" width="2%"><?=$row++;?></td>
+														<td>
+															Inventory Barang 1/2 Jadi
+														</td>
+														<td class="right nominal"><?=$inventory_barang_setengah_jadi?></td>
+													</tr>
+													<tr class="gradeX">
+														<td class="center" width="2%"><?=$row++;?></td>
+														<td>
+															Inventory Barang Jadi
+														</td>
+														<td class="right nominal"><?=$inventory_barang_jadi?></td>
+													</tr>
+													<?php 
+															$total_inventory = $inventory_barang_mentah + $inventory_barang_setengah_jadi + 
+																						$inventory_barang_jadi;
+														 ?>
+													<tr class="gradeX">
+														<td colspan="3">Total Inventory</td>
+														<td class="right nominal"><b><?=$total_inventory?></b></td>
+													</tr>
+												</table>
 											</p>
 											<p>
 												<label>Equipment </label>
@@ -145,24 +178,6 @@
 														<td class="right nominal"><b><?=$total_account_payable?></b></td>
 													</tr>
 												
-													<tr class="gradeX"><td colspan=4></td></tr>
-													
-													<tr class="gradeX">
-														<td colspan="3">
-															<a href="<?=base_url()?>index.php/liabilities/search/84" title="Detail">
-																Money Repaid
-															</a>
-														</td>
-														<td class="right nominal"><b><?=$money_repaid_nominal?></b></td>
-													</tr>
-													
-													<tr class="gradeX"><td colspan=4></td></tr>
-													
-													<tr class="gradeX">
-														<td colspan="3"><b>Total : </td>
-														<td class="right nominal"><b><?=$total_account_payable + $money_repaid_nominal?></b></td>
-													</tr>
-													
 												</table>
 											</p>
 											
@@ -171,37 +186,20 @@
 								<div class="span4 profile-right" id="equity">
 									<h4 class="widgettitle">&nbsp; Owner Equity / Kepemilikan </h4>
 									<div class="widgetcontent">
-														
 										<p>
-												<label>Original Investment</label>
-												<span class="field">
-													100.000
-												</span>
-											</p>
-											<p>
-												<label>Additional Investment</label>
-												<span class="field">
-													100.000
-												</span>
-											</p>
-											<p>
-												<label>Retain Earning</label>
-												<span class="field">
-													100.000
-												</span>
-											</p>
-											<p>
-												<label>Earning Week to Date</label>
-												<span class="field">
-													100.000
-												</span>
-											</p>
-											<p>
-												<label><b>Total : </b></label>
-												<span class="field">
-													200.000
-												</span>
-											</p>
+										<table width="100%" class="table " id="income_table">
+											<tr class="gradeX">
+												<td colspan="3">
+														Earnings
+												</td>
+												<td class="right nominal"><b><?=$earnings_nominal?></b></td>
+											</tr>
+											<tr class="gradeX">
+												<td colspan="3"><b>Total : </td>
+												<td class="right nominal"><b>---</b></td>
+											</tr>
+										</table>
+										</p>
 									</div>
 								</div>
 								
